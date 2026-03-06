@@ -11,8 +11,9 @@ public class Main extends Application {
     public void start(Stage window) {
         // Creates a Bank object and adds two bank accounts for test purposes
         Bank bank = new Bank();
-        bank.addBankAccount("10001", "11111", 100);
-        bank.addBankAccount("10002", "22222", 50);
+        bank.addBankAccount("10001", "11111", 100, "Basic");
+        bank.addBankAccount("10002", "22222", 50, "Basic");
+        bank.addBankAccount("10003", "33333", 300, "Student" );
 
         // UIModel-View-Controller structure setup
         // Create the UIModel, View and Controller objects and link them together

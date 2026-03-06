@@ -23,6 +23,10 @@ public class Bank {
         return new BankAccount(accNumber, accPasswd, balance);
     }
 
+    public BankAccount makeStudentAccount(String accNumber, String accPasswd, int balance){
+        return new StudentAccount(accNumber, accPasswd, balance);
+    }
+
     // a method to add a new bank account to the bank - it returns true if it succeeds
     // or false if it fails (because the bank is 'full')
     public boolean addBankAccount(BankAccount a) {
@@ -38,8 +42,14 @@ public class Bank {
     // Variant of addBankAccount: creates a BankAccount and adds it in one step.
     // This is an example of method overloading: two methods can share the same name
     // if they have different parameter lists.
-    public boolean addBankAccount(String accNumber, String accPasswd, int balance) {
-        return addBankAccount(makeBankAccount(accNumber, accPasswd, balance));
+    public boolean addBankAccount(String accNumber, String accPasswd, int balance, String accType) {
+        switch(accType){
+            case "Basic":
+                return addBankAccount(makeBankAccount(accNumber, accPasswd, balance));
+            case "Student":
+                return addBankAccount(makeStudentAccount(accNumber, accPasswd, balance));
+        }
+        return false;
     }
 
     // Check whether the given accountNumber and password match an existing BankAccount.
