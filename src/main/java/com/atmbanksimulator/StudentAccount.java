@@ -2,7 +2,7 @@ package com.atmbanksimulator;
 
 public class StudentAccount extends BankAccount {
     // Subclass of BankAccount used to hold the information for Student Accounts
-    private int withdrawLimit;
+    private int withdrawalLimit;
 
     public StudentAccount() {}
     public StudentAccount(String a, String p, int b) {
