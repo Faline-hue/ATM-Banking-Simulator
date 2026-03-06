@@ -12,11 +12,10 @@ public class BankAccount {
     private String accType = "";
 
     public BankAccount() {}
-    public BankAccount(String a, String p, int b, String t) {
+    public BankAccount(String a, String p, int b) {
         accNumber = a;
         accPasswd = p;
         balance = b;
-        accType = t; // Saving the withdrawal limit
     }
 
     // Withdraw money from this account.

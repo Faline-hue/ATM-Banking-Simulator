@@ -91,7 +91,6 @@ class View {
         window.setTitle("ATM-Bank Simulator"); //set window title
         window.show();
     }
-
     // This is how the View talks to the Controller
     // This method is called when a button is pressed
     // It fetches the label on the button and passes it to the controller's process method

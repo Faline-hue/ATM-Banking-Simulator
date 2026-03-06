@@ -19,8 +19,8 @@ public class Bank {
 
     // a method to create new BankAccount - this is known as a 'factory method' and is a more
     // flexible way to do it than just using the 'new' keyword directly.
-    public BankAccount makeBankAccount(String accNumber, String accPasswd, int balance, String accType) {
-        return new BankAccount(accNumber, accPasswd, balance, accType);
+    public BankAccount makeBankAccount(String accNumber, String accPasswd, int balance) {
+        return new BankAccount(accNumber, accPasswd, balance);
     }
 
     // a method to add a new bank account to the bank - it returns true if it succeeds
@@ -38,8 +38,8 @@ public class Bank {
     // Variant of addBankAccount: creates a BankAccount and adds it in one step.
     // This is an example of method overloading: two methods can share the same name
     // if they have different parameter lists.
-    public boolean addBankAccount(String accNumber, String accPasswd, int balance, String accType) {
-        return addBankAccount(makeBankAccount(accNumber, accPasswd, balance, accType));
+    public boolean addBankAccount(String accNumber, String accPasswd, int balance) {
+        return addBankAccount(makeBankAccount(accNumber, accPasswd, balance));
     }
 
     // Check whether the given accountNumber and password match an existing BankAccount.
