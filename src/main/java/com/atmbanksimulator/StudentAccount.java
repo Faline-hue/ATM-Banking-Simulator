@@ -21,7 +21,7 @@ public class StudentAccount extends BankAccount {
           - If the date has changed, daily cap resets.
     */
 
-    /* Take requested withdraw amount, compare to withdrawlimit - dailycap to see if they can still withdraw
+    /* Take requested withdraw amount, compare to withdraw limit - daily cap to see if they can still withdraw
     *
     * */
 }
