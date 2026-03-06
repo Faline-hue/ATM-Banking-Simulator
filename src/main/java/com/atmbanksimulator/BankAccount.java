@@ -7,9 +7,8 @@ package com.atmbanksimulator;
 // - Provides methods to withdraw, deposit, check balance, etc.
 public class BankAccount {
     private String accNumber = "";
-    private String accPasswd ="";
+    private String accPasswd = "";
     private int balance = 0;
-    private String accType = "";
 
     public BankAccount() {}
     public BankAccount(String a, String p, int b) {
@@ -23,9 +22,7 @@ public class BankAccount {
     public boolean withdraw( int amount ) {
         if (amount < 0 || balance < amount) {
             return false;
-        } else if(accType.equals("student")){
-            return false;
-        }else {
+        } else {
             balance = balance - amount;  // subtract amount from balance
             return true;
         }
@@ -42,22 +39,49 @@ public class BankAccount {
         }
     }
 
-    // Inheritance method below
-
     // Getter for the account balance
     // Returns the current balance of this account
     public int getBalance() {
         return balance;
     }
 
-    // Getter for the account number
-    public String getAccNumber() {
+    //temporarily made separate getters and setters for subclasses - i feel like the public account number and password should be different?
+    protected void setAccountNumber(String s){
+        accNumber = s;
+    }
+    protected void setAccountPassword(String s){
+        accPasswd = s;
+    }
+    protected void setAccountBalance(int i){
+        balance = i;
+    }
+
+    protected String getAccountNumber(){
         return accNumber;
     }
-    // Getter for the account password
-    public String getaccPasswd() {
+    protected String getAccountPassword(){
         return accPasswd;
     }
+    protected int getAccountBalance(){
+        return balance;
+    }
 
+    public boolean checkAccountNumber(String s) {
+        return(s.equals(getAccountNumber()));
+    }
+    public boolean checkPassword(String s) {
+        return(s.equals(getAccountPassword()));
+    }
 
+    //temporary change password
+    public boolean changePassword(String prevPassword, String newPassword) {
+        if (checkPassword(prevPassword) && !checkPassword(newPassword)) {
+            setAccountPassword(newPassword);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
+
