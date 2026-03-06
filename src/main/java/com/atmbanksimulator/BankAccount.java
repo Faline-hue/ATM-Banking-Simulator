@@ -76,7 +76,10 @@ public class BankAccount {
         return balance;
     }
 
-    protected boolean checkPassword(String s) {
+    public boolean checkAccountNumber(String s) {
+        return(s.equals(getAccountNumber()));
+    }
+    public boolean checkPassword(String s) {
         return(s.equals(getAccountPassword()));
     }
 
