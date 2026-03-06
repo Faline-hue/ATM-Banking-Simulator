@@ -45,16 +45,6 @@ public class BankAccount {
         return balance;
     }
 
-    // Getter for the account number
-    //later on i think this should be changed to comparing the entered number and the actual account number
-    public String getAccNumber() {
-        return accNumber;
-    }
-    // Getter for the account password
-    public String getaccPasswd() {
-        return accPasswd;
-    }
-
     //temporarily made separate getters and setters for subclasses - i feel like the public account number and password should be different?
     protected void setAccountNumber(String s){
         accNumber = s;
