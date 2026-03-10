@@ -21,11 +21,10 @@ public class PrimeAccount extends BankAccount {
     // Withdraw money from this account.
     // Returns true if successful, or false if the amount is negative or exceeds the current balance or withdrawal limit
     public boolean withdraw( int amount ) {
-        if (amount < 0 || amount > withdrawalLimit || getAccountBalance() < amount) {
-            return false;
-        } else {
-            setAccountBalance(getAccountBalance() - amount);  // subtract amount from balance
+        if (super.withdraw(amount)){
             return true;
+        } else {
+            return false;
         }
     }
 }
