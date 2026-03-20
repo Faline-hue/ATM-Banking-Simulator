@@ -129,4 +129,23 @@ public class Bank {
             return -1; // use -1 as an indicator of an error
         }
     }
+
+    // attempt to change password of the logged-in account
+    public boolean changePassword(String prevPass, String newPass) {
+        if (loggedIn()) {
+            return loggedInAccount.changePassword(prevPass, newPass);
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean checkPassword(String p) {
+        if (loggedIn()) {
+            return loggedInAccount.checkPassword(p);
+        }
+        else {
+            return false;
+        }
+    }
 }
