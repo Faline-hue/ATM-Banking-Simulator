@@ -2,34 +2,21 @@ package com.atmbanksimulator;
 
 public class StudentAccount extends BankAccount {
     // Subclass of BankAccount used to hold the information for Student Accounts
-    private int withdrawalLimit;
 
     public StudentAccount() {}
     public StudentAccount(String a, String p, int b) {
-        setAccountNumber(a);
-        setAccountPassword(p);
-        setAccountBalance(b);
+        accNumber = a;
+        accPasswd = p;
+        balance = b;
         withdrawalLimit = 250;
+        dailyCap = 0;
     }
-    
-        public StudentAccount(String a, String p, int b, int w){
-        setAccountNumber(a);
-        setAccountPassword(p);
-        setAccountBalance(b);
-        withdrawalLimit = w;
+    // Uses method from superclass to withdraw cash from accounts balance
+    // Updates the daily cap so user cannot take more than the cap
+    public boolean withdraw( int amount ) {
+        return super.withdraw(amount);
     }
 
-    // Withdraw money from this account.
-    // Returns true if successful, or false if the amount is negative or exceeds the current balance.
-    public boolean withdraw( int amount ) {
-        if (amount < 0 || amount > withdrawalLimit || getAccountBalance() < amount) {
-            return false;
-        } else {
-            setAccountBalance(getAccountBalance() - amount);  // subtract amount from balance
-            return true;
-        }
-    }
-    
     /* Use a method to check if the withdrawal limit has been reached for the day,
 
          Everytime the account is accessed:
@@ -38,7 +25,5 @@ public class StudentAccount extends BankAccount {
           - If the date has changed, daily cap resets.
     */
 
-    /* Take requested withdraw amount, compare to withdrawlimit - dailycap to see if they can still withdraw
-    *
-    * */
+    /* Take requested withdraw amount, compare to withdraw limit - daily cap to see if they can still withdraw */
 }

@@ -13,19 +13,16 @@ public class UIModel {
     private Bank bank; // The ATM communicates with this Bank
 
     // The ATM UIModel can be in one of three states:
-    // 1. Waiting for an account number
-    // 2. Waiting for a password
-    // 3. Logged in (ready to process requests for the logged-in account)
     // We represent each state with a String constant.
     // The 'final' keyword ensures these values cannot be changed.
-    private final String STATE_ACCOUNT_NO = "account_no";
-    private final String STATE_PASSWORD = "password";
-    private final String STATE_LOGGED_IN = "logged_in";
+    private final String STATE_ACCOUNT_NO = "account_no"; // 1. Waiting for an account number
+    private final String STATE_PASSWORD = "password";     // 2. Waiting for a password
+    private final String STATE_LOGGED_IN = "logged_in";   // 3. Logged in (ready to process requests)
 
     // Variables representing the state and data of the ATM UIModel
     private String state = STATE_ACCOUNT_NO;    // Current state of the ATM
-    private String accNumber = "";         // Account number being typed
-    private String accPasswd = "";         // Password being typed
+    private String accNumber = "";              // Account number being typed
+    private String accPasswd = "";              // Password being typed
 
     // Variables shown on the View display
     private String message;                // Message label text

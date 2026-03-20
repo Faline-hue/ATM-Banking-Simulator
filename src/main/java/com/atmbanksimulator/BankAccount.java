@@ -6,24 +6,31 @@ package com.atmbanksimulator;
 // - Stores instance variables for account number, password, and balance
 // - Provides methods to withdraw, deposit, check balance, etc.
 public class BankAccount {
-    private String accNumber = "";
-    private String accPasswd = "";
-    private int balance = 0;
+    protected String accNumber = "";
+    protected String accPasswd = "";
+    protected int balance = 0;
+    protected int withdrawalLimit = 0;
+    protected int dailyCap = 0;
 
     public BankAccount() {}
     public BankAccount(String a, String p, int b) {
         accNumber = a;
         accPasswd = p;
         balance = b;
+        withdrawalLimit = 500;
+        dailyCap = 0;
     }
 
     // Withdraw money from this account.
     // Returns true if successful, or false if the amount is negative or exceeds the current balance.
     public boolean withdraw( int amount ) {
-        if (amount < 0 || balance < amount) {
-            return false;
-        } else {
-            balance = balance - amount;  // subtract amount from balance
+        if (amount < 0 || balance < amount ) {
+            return false; // Needs to alert user that they don't have the funds to withdraw that amount
+        } else if ( withdrawalLimit < amount || (withdrawalLimit - dailyCap) < amount){
+            return false; // Needs to alert user that they only have "x" amount left that they can withdraw today
+        }else {
+            balance = balance - amount; // Subtract amount withdrawn
+            dailyCap = dailyCap + amount; // Update daily cap
             return true;
         }
     }
@@ -45,7 +52,7 @@ public class BankAccount {
         return balance;
     }
 
-    //temporarily made separate getters and setters for subclasses - i feel like the public account number and password should be different?
+    // Temporarily made separate getters and setters for subclasses - I feel like the public account number and password should be different?
     protected void setAccountNumber(String s){
         accNumber = s;
     }
