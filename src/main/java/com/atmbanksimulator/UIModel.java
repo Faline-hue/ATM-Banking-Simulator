@@ -238,6 +238,31 @@ public class UIModel {
         update();
     }
 
+    // NOT WORKING YET
+    // possibly change UI because the process of this is really confusing and could cause a lot of problems if a user messes it up
+    // Handle the Change Password button:
+    public void processPasswordChange() {
+        if (state.equals(STATE_LOGGED_IN)) {
+            accPasswd = numberPadInput;
+            numberPadInput = "";
+            // at this point the user needs to press enter so possibly need new state to add an effect in processEnter
+            if ( bank.changePassword(accPasswd, numberPadInput) )
+            {
+                // Correct password entered
+                message = "Password correct";
+                result = "Enter new password";
+            } else {
+                // incorrect password entered - not sure whether to log out or not
+                // but bank.changePassword method won't change the password if it's returning false
+                reset("Incorrect password");
+            }
+        }
+        else {
+            reset("You are not logged in");
+        }
+        update();
+    }
+
     // Handle the Finish button:
     // - If the user is logged in, log out
     // - Otherwise, reset the ATM and display an error message
