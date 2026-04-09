@@ -6,13 +6,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+import java.time.*;
 
 // The View class creates the GUI for the application.
 // It does not know anything about business logic;
 // it only updates the display when notified by the UIModel.
 
 class View {
-    int H = 500;         // Height of window pixels
+    int H = 650;         // Height of window pixels
     int W = 500;         // Width  of window pixels
 
     Controller controller; // Reference to the Controller (part of the MVC setup)
@@ -24,12 +25,13 @@ class View {
     private ScrollPane scrollPane; // Provides scrollbars around the TextArea
     private GridPane grid;      // Main layout container (grid-based)
     private TilePane buttonPane;// Container for ATM keypad buttons (tiled layout)
+    private Label dateMsg;      // To display current date
 
     // start() is called from Main to set up the UI.
-    // Important: Controls are created here so everything is initialized in the correct order
+    // Important: Controls are created here so everything is initialised in the correct order
     public void start(Stage window) {
         // Create the user interface component objects.
-        // The ATM UI is organized as a vertical grid with four main parts:
+        // The ATM UI is organised as a vertical grid with four main parts:
         // 1. A message label
         // 2. A text field showing numbers
         // 3. A text area showing transaction results, summaries, and user instructions
@@ -84,6 +86,9 @@ class View {
         }
         grid.add(buttonPane,0,3); // add the tiled pane of buttons to the main grid
 
+        dateMsg = new Label();
+        grid.add(dateMsg, 0, 4);       // Add to GUI next to laMsg
+
         // add the complete GUI to the window and display it
         Scene scene = new Scene(grid, W, H);
         scene.getStylesheets().add("atm.css"); // tell to use our CSS file
@@ -112,5 +117,8 @@ class View {
         laMsg.setText(msg);
         tfInput.setText(tfInputMsg);
         taResult.setText(taResultMsg);
+
+        LocalDate currentDate = LocalDate.now(); // Creates a date object with the current date
+        dateMsg.setText(String.valueOf(currentDate)); // Assigns the current date to the label
     }
 }
