@@ -8,6 +8,10 @@ package com.atmbanksimulator;
 // executes commands provided by the controller and tells the view to update when
 // something changes
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 public class UIModel {
     View view; // Reference to the View (part of the MVC setup)
     private Bank bank; // The ATM communicates with this Bank
@@ -34,7 +38,7 @@ public class UIModel {
         this.bank = bank;
     }
 
-    // Initialize the ATM UIModel: this method is called by Main when starting the app
+    // Initialise the ATM UIModel: this method is called by Main when starting the app
     // - Set state to STATE_ACCOUNT_NO
     // - Clear the numberPadInput - numbers displayed in the TextField
     // - Display the welcome message and user instructions
@@ -151,10 +155,8 @@ public class UIModel {
      * Parses a string into a valid transaction amount.
      * - If the string is empty, invalid, or consists only of zeros, returns 0.
      * - Otherwise, returns the integer value.
-     *
      * Purpose:
      * Helper method for validating user-entered amounts in transactions (Deposit, Withdraw, etc.).
-     *
      * Note: If you later add features like Transfer, this method can be reused.
      */
     private int parseValidAmount(String number) {
@@ -183,9 +185,11 @@ public class UIModel {
     }
 
     // Handle the Withdraw button:
-    // If the user is logged in, attempt to withdraw the amount entered;
-    // otherwise, reset the ATM and display an error message.
-    // Reads the amount from numberPadInput, validates it, and updates messages/results accordingly.
+    // - If the user is logged in, attempt to withdraw the amount entered;
+    //  - If the user has exceeded their withdrawal limit for the day it will fail and notify them
+    //  - If the user has insufficient funds it will fail and notify them
+    // - otherwise, reset the ATM and display an error message.
+    // - Reads the amount from numberPadInput, validates it, and updates messages/results accordingly.
     public void processWithdraw() {
         if (state.equals(STATE_LOGGED_IN)) {
             int amount = parseValidAmount(numberPadInput);
@@ -194,7 +198,18 @@ public class UIModel {
                     message = "Withdraw Successful";
                     result = "Withdrawn: " + numberPadInput;
                 }
-                else{
+                else if(!bank.withdraw( amount)){
+                    if(bank.getDailyCap() == bank.getWithdrawalLimit()){
+                        message = "Withdraw Failed: You've reached your withdraw limit for the day";
+                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                    } else if(amount > (bank.getWithdrawalLimit() - bank.getDailyCap())){
+                        message = "Withdraw Failed: You can only withdraw " + bank.getLimit() + " more today";
+                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                    } else {
+                        message = "Withdraw Failed: Insufficient Funds";
+                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                    }
+                } else {
                     message = "Withdraw Failed: Insufficient Funds";
                     result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
                 }
@@ -208,6 +223,7 @@ public class UIModel {
         else {
             reset("You are not logged in");
         }
+        // save(); - Will be called here when a withdrawal is made to make sure that the change is saved
         update();
     }
 
@@ -224,7 +240,7 @@ public class UIModel {
                 result = "Deposited: " + numberPadInput;
             }
             else {
-                message = "Invaild Amount";
+                message = "Invalid Amount";
                 result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
             }
             numberPadInput = "";
@@ -232,6 +248,7 @@ public class UIModel {
         else {
             reset("You are not logged in");
         }
+        // save(); - Will be called here when a deposit is made to make sure that the change is saved
         update();
     }
 
@@ -284,5 +301,23 @@ public class UIModel {
     private void update() {
         view.update(message,numberPadInput, result);
     }
+    /*
+    - Commented out as currently not currently functional -
+
+    // Save the Bank object to a serialized file so it can be reloaded when program is next run
+    public void save() {
+        // Test serialization to local file
+        try (
+                FileOutputStream fileOut = new FileOutputStream("bank.ser");
+                ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+
+            out.writeObject(bank);
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+     */
 }
 
