@@ -10,8 +10,17 @@ Features of the ATM:
    - When withdrawing, program checks if the user is attempting to withdraw more than their daily limit
    - Alerts user if they cannot withdraw any more today
  - Current date is read into program for multiple checks
- 
 
+
+This Branch:
+-
+
+I've switched the accounts array to an array list, allowing us to leverage the fuctions of an array list.
+I've also added the fuctionality to save the array list to a serialised file and load it from the serialised file. "bank.ser"
+To read what got serialised, load the "output.json" file
+UNFORTUNATELY
+If you edit the BankAccount or StudentAccount classes then you will need to delete BOTH the bank.ser file and output.json file before running
+ 
 
 Additions to make:
 -
