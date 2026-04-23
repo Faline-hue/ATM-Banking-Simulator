@@ -2,10 +2,16 @@ package com.atmbanksimulator;
 
 // ===== Bank (Domain / Service / Business Logic) =====
 
-import java.io.FileWriter;
-import java.io.IOException;
+import org.json.JSONArray;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.type.ArrayType;
+
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 /* Bank class: a simple implementation of a bank, containing a list of bank accounts
 *  and has a currently logged-in account (loggedInAccount).
@@ -13,20 +19,17 @@ import java.io.Serializable;
 *   . Created by main upon program start
 *   . New bank accounts are added to the array contained within this class using addBankAccount
 */
-public class Bank implements Serializable{
+public class Bank implements Serializable {
 
     /*
      ToDO: Optional extension:
      Improve account management in the Bank class:
-     Replace Array with ArrayList for managing BankAccount objects.
      Refactor addBankAccount and login methods to leverage ArrayList.
     */
 
     // Instance variables storing bank information
-    final int maxAccounts = 10;                                     // Maximum number of accounts the bank can hold
-    private int numAccounts = 0;                                    // Current number of accounts in the bank
-    final BankAccount[] accounts = new BankAccount[maxAccounts];    // Array to hold BankAccount objects
-    private BankAccount loggedInAccount = null;                     // Currently logged-in account ('null' if no one is logged in)
+    List<BankAccount> accounts = new ArrayList<BankAccount>();        // Array to hold BankAccount objects
+    private BankAccount loggedInAccount = null;                                  // Currently logged-in account ('null' if no one is logged in)
 
     // A method to create new BankAccount - this is known as a 'factory method' and is a more
     // flexible way to do it than just using the 'new' keyword directly.
@@ -41,9 +44,10 @@ public class Bank implements Serializable{
     // A method to add a new bank account to the bank - it returns true if it succeeds
     // or false if it fails (because the bank is 'full')
     public boolean addBankAccount(BankAccount a) {
-        if (numAccounts < maxAccounts) {
-            accounts[numAccounts] = a; // adds new account in next space (X-1 = last account in array)
-            numAccounts++ ;
+        if (a != null) {
+            accounts.add(a); // adds new account
+            Collections.sort(accounts,
+                    (o1, o2) -> o1.getAccountNumber().compareTo(o2.getAccountNumber()));
             return true;
         } else {
             return false;
@@ -184,6 +188,32 @@ public class Bank implements Serializable{
         }
         else {
             return false;
+        }
+    }
+    // Used to read the array list of accounts in UIModel
+    public List json() {
+        return accounts;
+    }
+
+    /*public void load() {
+        ObjectMapper mapper = new ObjectMapper();
+        List<BankAccount> jsonList = mapper.readValue(new File("output.json"), new TypeReference<List>(){});
+        accounts = jsonList;
+        System.out.println(accounts);
+    }*/
+    public List load() {
+        try{
+            FileInputStream fis = new FileInputStream("bank.ser");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            List<BankAccount> accounts1 = (List<BankAccount>) ois.readObject();
+            ois.close();
+            return accounts1;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

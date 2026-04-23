@@ -8,9 +8,11 @@ package com.atmbanksimulator;
 // executes commands provided by the controller and tells the view to update when
 // something changes
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import org.json.JSONArray;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+
+import java.io.*;
 
 public class UIModel {
     View view; // Reference to the View (part of the MVC setup)
@@ -223,7 +225,8 @@ public class UIModel {
         else {
             reset("You are not logged in");
         }
-        // save(); - Will be called here when a withdrawal is made to make sure that the change is saved
+        save(); //- Will save data to a serialized file for loading
+        saveRead(); // Will save data to a readable file for testing
         update();
     }
 
@@ -248,7 +251,8 @@ public class UIModel {
         else {
             reset("You are not logged in");
         }
-        // save(); - Will be called here when a deposit is made to make sure that the change is saved
+        save(); //- Will save data to a serialized file for loading
+        saveRead(); // Will save data to a readable file for testing
         update();
     }
 
@@ -301,9 +305,18 @@ public class UIModel {
     private void update() {
         view.update(message,numberPadInput, result);
     }
-    /*
-    - Commented out as currently not currently functional -
 
+    // Writes the accounts array list to JSON file - Readable for testing
+    private void saveRead() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try{
+            // Writing the list directly into a JSON file
+            objectMapper.writeValue(new File("output.json"), bank.json());
+            System.out.println("JSON array has been written to output.json file.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     // Save the Bank object to a serialized file so it can be reloaded when program is next run
     public void save() {
         // Test serialization to local file
@@ -311,13 +324,10 @@ public class UIModel {
                 FileOutputStream fileOut = new FileOutputStream("bank.ser");
                 ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 
-            out.writeObject(bank);
-        } catch (
-                IOException e) {
+            out.writeObject(bank.accounts);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-     */
 }
 

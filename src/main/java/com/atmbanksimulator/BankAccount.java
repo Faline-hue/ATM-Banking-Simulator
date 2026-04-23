@@ -1,14 +1,14 @@
 package com.atmbanksimulator;
 
-import java.time.*;
 import java.io.Serializable;
+import java.time.*;
 
 // ===== 📚🌐BankAccount (Domain / Service / Business Logic) =====
 
 // BankAccount class:
 // - Stores instance variables for account number, password, and balance
 // - Provides methods to withdraw, deposit, check balance, etc.
-public class BankAccount implements Serializable{
+public class BankAccount implements Serializable {
     // Initialize variables
     protected String accNumber = "";
     protected String accPasswd = "";
@@ -24,7 +24,7 @@ public class BankAccount implements Serializable{
         this.balance = b;                   // Total amount of money on the account
         this.withdrawalLimit = 500;         // Limit on how much can be withdrawn daily
         this.dailyCap = 0;                  // Counts how much has been withdrawn daily
-        this.acsDate = currentDate;         // Default assignment of current date when created
+        this.acsDate = LocalDate.now();     // Default assignment of current date when created
     }
 
     // Getters - utilised by methods
@@ -39,7 +39,7 @@ public class BankAccount implements Serializable{
     }
     public int getWithdrawalLimit() { return withdrawalLimit;}
     public int getDailyCap() { return dailyCap;}
-    public LocalDate currentDate = LocalDate.now(); // Creates a date object with the current date
+    public LocalDate getAcsDate() { return acsDate;}
 
     // Withdraw money from this account.
     // Returns true if successful, or false if the amount is negative or exceeds the current balance.
@@ -70,13 +70,13 @@ public class BankAccount implements Serializable{
     // Check if the time has passed since the account was last accessed
     // If it's a new day, the daily cap is reset
     public boolean accessDate() {
-        if (currentDate.isAfter(acsDate)){          // If a day has passed since the user last accessed then
-            dailyCap = 0;                           // Their daily withdrawal limit needs to be reset
-            acsDate = currentDate;
+        if (LocalDate.now().isAfter(this.acsDate)){          // If a day has passed since the user last accessed then
+            this.dailyCap = 0;                           // Their daily withdrawal limit needs to be reset
+            this.acsDate = LocalDate.now();
             return true;
-        } else if (currentDate.isBefore(acsDate)){  // Avoiding errors with system
+        } else if (LocalDate.now().isBefore(this.acsDate)){  // Avoiding errors with system
             return false;
-        } else if (currentDate.isEqual(acsDate)){   // Nothing changes if the same date
+        } else if (LocalDate.now().isEqual(this.acsDate)){   // Nothing changes if the same date
             return false;
         }
         return false;

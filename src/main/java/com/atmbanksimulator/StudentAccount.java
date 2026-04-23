@@ -1,5 +1,7 @@
 package com.atmbanksimulator;
 
+import java.time.LocalDate;
+
 public class StudentAccount extends BankAccount {
     // Subclass of BankAccount used to hold the information for Student Accounts
 
@@ -10,7 +12,7 @@ public class StudentAccount extends BankAccount {
         this.balance = b;                   // Total amount of money on the account
         this.withdrawalLimit = 250;         // Limit on how much can be withdrawn daily
         this.dailyCap = 0;                  // Counts how much has been withdrawn daily
-        this.acsDate = currentDate;         // Default assignment of current date when created
+        this.acsDate = LocalDate.now();         // Default assignment of current date when created
     }
     // Uses method from superclass to withdraw cash from accounts balance
     // Updates the daily cap so user cannot take more than the cap
