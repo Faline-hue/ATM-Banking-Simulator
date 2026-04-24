@@ -112,8 +112,7 @@ public class UIModel {
                 // Waiting for a complete account number
                 // If nothing was entered, reset with "Invalid Account Number"
                 if (numberPadInput.isEmpty()) {
-                    message = "Invalid Account Number";
-                    reset(message);
+                    reset("Invalid Account Number");
                 }
                 else{
                     // Save the entered number as accNumber, clear numberPadInput,
@@ -140,8 +139,7 @@ public class UIModel {
                     result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
                 } else {
                     // Login failed: reset ATM and display error
-                    message = "Login failed: Unknown Account/Password";
-                    reset(message);
+                    reset("Login failed: Unknown Account/Password");
                 }
                 break;
             case STATE_CHANGE_PASSWORD:
@@ -377,7 +375,6 @@ TO DO
     - technically it should be secure as is cause the variables are only accessed via functions that overwrite them
     - but it just feels weird having the account number variable still be the account number of the last account that was logged in while the atm is idle
 - add some kind of "cancel" button for multiple-step interactions
-- change various if/elses in methods to switches
 - also a problem where the reset() method doesn't log the current account out but does send it back to asking for an account number
     - so a user might assume it's logged them out after an invalid action and just leave
     - like with the previous variables you can't do anything on the logged in account directly but it feels weird to have the logged in account just hanging around like that
