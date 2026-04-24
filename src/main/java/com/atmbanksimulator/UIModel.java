@@ -156,6 +156,8 @@ public class UIModel {
                     if (bank.changePassword(accPasswd)) {
                         message = "Password changed";
                         result = "Valid password entered; please keep track of your new password and use it to log in in future";
+                        save();
+                        saveRead();
                     }
                     else {
                         message = "Password not changed";
@@ -287,8 +289,7 @@ public class UIModel {
         update();
     }
 
-    // NOT WORKING YET
-    // possibly change UI because the process of this is really confusing and could cause a lot of problems if a user messes it up
+    // possibly change UI because the process of this is really confusing and could cause problems if a user messes it up
     // Handle the Change Password button:
     public void processChangePassword() {
         switch (state) {
