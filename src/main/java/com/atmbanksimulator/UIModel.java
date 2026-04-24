@@ -301,6 +301,9 @@ public class UIModel {
                 result = "Try again or contact the bank for help"; // <- keeps user logged in, lets them enter password again (maybe the better option because if they're logged in they obviously know their password so could be a typo)
             }
         }
+        else if (state.equals(STATE_CHANGE_PASSWORD)) {
+            // do nothing; this is just to stop it logging the user out if they press the wrong button to enter the new password
+        }
         else {
             reset("You are not logged in");
         }
@@ -366,4 +369,6 @@ TO DO
     - technically it should be secure as is cause the variables are only accessed via functions that overwrite them
     - but it just feels weird having the account number variable still be the account number of the last account that was logged in while the atm is idle
 - add some kind of "cancel" button for multiple-step interactions
+- change various if/elses in methods to switches
+-
  */
