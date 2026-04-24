@@ -57,7 +57,10 @@ public class UIModel {
     // - Clear the numberPadInput
     // - Display the provided message and user instructions
     private void reset(String msg) {
+        bank.logout();
         setState(STATE_ACCOUNT_NO);
+        accNumber = "";
+        accPasswd = "";
         numberPadInput = "";
         message = msg;
         result = "Enter your account number\nFollowed by \"Ent\"";
@@ -321,7 +324,6 @@ public class UIModel {
             case STATE_CHANGE_PASSWORD: break;
             case STATE_LOGGED_IN:
                 reset("Thank you for using the Bank ATM");
-                bank.logout();
                 break;
             default:
                 reset("You are not logged in");
@@ -371,12 +373,7 @@ TO DO
     - current version has it log out to asking for account number every time
     - which doesn't seem super helpful in situations like mis-typing the current password when trying to change it
     - although technically it would be more secure as if the password was mis-typed then  the user should know the information to log in again
-- also maybe make the reset function clear all variables that were entered past a certain point
-    - technically it should be secure as is cause the variables are only accessed via functions that overwrite them
-    - but it just feels weird having the account number variable still be the account number of the last account that was logged in while the atm is idle
+    - don't change reset method for this as it now logs the user out, add new method to go back to previous states if needed
 - add some kind of "cancel" button for multiple-step interactions
-- also a problem where the reset() method doesn't log the current account out but does send it back to asking for an account number
-    - so a user might assume it's logged them out after an invalid action and just leave
-    - like with the previous variables you can't do anything on the logged in account directly but it feels weird to have the logged in account just hanging around like that
 - add methods to validate amounts to withdraw and deposit for individual accounts/account types and use those in the processWithdraw() and processDeposit() methods
  */
