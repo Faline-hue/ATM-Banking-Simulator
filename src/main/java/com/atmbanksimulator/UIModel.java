@@ -8,9 +8,9 @@ package com.atmbanksimulator;
 // executes commands provided by the controller and tells the view to update when
 // something changes
 
-import org.json.JSONArray;
+
+
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
 
 import java.io.*;
 

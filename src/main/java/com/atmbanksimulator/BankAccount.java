@@ -14,7 +14,9 @@ public class BankAccount implements Serializable {
     protected String accPasswd = "";
     protected int balance = 0;
     protected int withdrawalLimit = 0;
-    protected int dailyCap = 0;
+    protected int dCapWD = 0;
+    protected int depositLimit = 0;
+    protected int dCapD = 0;
     protected LocalDate acsDate = null;
 
     public BankAccount() {}                 // Constructor
@@ -23,7 +25,9 @@ public class BankAccount implements Serializable {
         this.accPasswd = p;                 // Holds the accounts password
         this.balance = b;                   // Total amount of money on the account
         this.withdrawalLimit = 500;         // Limit on how much can be withdrawn daily
-        this.dailyCap = 0;                  // Counts how much has been withdrawn daily
+        this.dCapWD = 0;                    // Counts how much has been withdrawn on current day
+        this.depositLimit = 3000;           // Limit on how much can be deposited daily
+        this.dCapD = 0;                     // Counts how much has been deposited on current day
         this.acsDate = LocalDate.now();     // Default assignment of current date when created
     }
 
@@ -38,7 +42,7 @@ public class BankAccount implements Serializable {
         return balance;
     }
     public int getWithdrawalLimit() { return withdrawalLimit;}
-    public int getDailyCap() { return dailyCap;}
+    public int getDailyCap() { return dCapWD;}
     public LocalDate getAcsDate() { return acsDate;}
 
     // Withdraw money from this account.
@@ -46,11 +50,11 @@ public class BankAccount implements Serializable {
     public boolean withdraw( int amount ) {
         if (amount < 0 || balance < amount ) {
             return false; // Needs to alert user that they don't have the funds to withdraw that amount
-        } else if ( withdrawalLimit < amount || (withdrawalLimit - dailyCap) < amount){
+        } else if ( withdrawalLimit < amount || (withdrawalLimit - dCapWD) < amount){
             return false; // Needs to alert user that they only have "x" amount left that they can withdraw today
         }else {
             balance = balance - amount;     // Subtract amount withdrawn from balance
-            dailyCap = dailyCap + amount;   // Update daily cap
+            dCapWD = dCapWD + amount;   // Update daily cap
             return true;
         }
     }
@@ -60,9 +64,12 @@ public class BankAccount implements Serializable {
     public boolean deposit( int amount ) {
         if (amount < 0) {                // Check user has entered an amount
             // *Need to check if they have reached the daily/Annual limit for deposits*
-            return false;
+            return false; // Needs to alert user that they haven't entered a number
+        } else if( depositLimit < amount || (depositLimit - dCapD) < amount){
+            return false; // Needs to alert user that they can only deposit "x" amount more today
         } else {
-            balance = balance + amount;  // add amount to balance
+            balance = balance + amount;  // Add amount to balance
+            dCapD = dCapD + amount;     // Update daily cap
             return true;
         }
     }
@@ -71,7 +78,7 @@ public class BankAccount implements Serializable {
     // If it's a new day, the daily cap is reset
     public boolean accessDate() {
         if (LocalDate.now().isAfter(this.acsDate)){          // If a day has passed since the user last accessed then
-            this.dailyCap = 0;                           // Their daily withdrawal limit needs to be reset
+            this.dCapWD = 0;                           // Their daily withdrawal limit needs to be reset
             this.acsDate = LocalDate.now();
             return true;
         } else if (LocalDate.now().isBefore(this.acsDate)){  // Avoiding errors with system
