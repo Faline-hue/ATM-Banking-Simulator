@@ -22,6 +22,8 @@ public class UIModel {
     private final String STATE_ACCOUNT_NO = "account_no"; // 1. Waiting for an account number
     private final String STATE_PASSWORD = "password";     // 2. Waiting for a password
     private final String STATE_LOGGED_IN = "logged_in";   // 3. Logged in (ready to process requests)
+    // i added this state:
+    private final String STATE_CHANGE_PASSWORD = "change_password";
 
     // Variables representing the state and data of the ATM UIModel
     private String state = STATE_ACCOUNT_NO;    // Current state of the ATM
@@ -142,7 +144,30 @@ public class UIModel {
                     reset(message);
                 }
                 break;
-
+            case STATE_CHANGE_PASSWORD:
+                accPasswd = numberPadInput;
+                numberPadInput = "";
+                if (accPasswd.isEmpty()) {
+                    message = "Input empty";
+                    result = "Password not changed; type new password and press 'enter'"; // <- also needs to explain new password rules
+                }
+                else if (bank.validatePassword(accPasswd)) {
+                    if (bank.changePassword(accPasswd)) {
+                        message = "Password changed";
+                        result = "Valid password entered; please keep track of your new password and use it to log in in future";
+                    }
+                    else {
+                        message = "Password not changed";
+                        result = "Input was valid but another error occurred; your previous password will still be used to log in";
+                    }
+                    setState(STATE_LOGGED_IN); // change to logged-in state if valid password was entered, whether or not password was changed
+                    // if password wasn't changed for a different reason to the input not being valid, entering new input probably won't help
+                }
+                else {
+                    message = "Password not changed";
+                    result = "Invalid input; please enter new password and press 'enter'"; // also explain password rules
+                }
+                break;
             case STATE_LOGGED_IN:
             default:
                 // Do nothing for other states (user is already logged in)
@@ -255,20 +280,23 @@ public class UIModel {
     // NOT WORKING YET
     // possibly change UI because the process of this is really confusing and could cause a lot of problems if a user messes it up
     // Handle the Change Password button:
-    public void processPasswordChange() {
+    public void processChangePassword() {
         if (state.equals(STATE_LOGGED_IN)) {
             accPasswd = numberPadInput;
             numberPadInput = "";
             // at this point the user needs to press enter so possibly need new state to add an effect in processEnter
-            if ( bank.changePassword(accPasswd, numberPadInput) )
+            if ( bank.checkPassword(accPasswd) )
             {
                 // Correct password entered
+                setState(STATE_CHANGE_PASSWORD); // changes the state so that when enter is pressed again it will do validate password step
                 message = "Password correct";
-                result = "Enter new password";
+                result = "Type new password and press 'enter'"; // explain rules new password must follow somewhere
             } else {
                 // incorrect password entered - not sure whether to log out or not
-                // but bank.changePassword method won't change the password if it's returning false
-                reset("Incorrect password");
+                // but bank.changePassword method won't change the state to allow changing password if it's returning false
+                // reset("Password incorrect, logging out for security reasons") // <- resets to asking for account number, logging the user out
+                message = "Password incorrect";
+                result = "Try again or contact the bank for help"; // <- keeps user logged in, lets them enter password again (maybe the better option because if they're logged in they obviously know their password so could be a typo)
             }
         }
         else {
@@ -320,4 +348,14 @@ public class UIModel {
 
      */
 }
-
+/*
+TO DO
+- maybe change reset function to work to reset to different states?
+    - current version has it log out to asking for account number every time
+    - which doesn't seem super helpful in situations like mis-typing the current password when trying to change it
+    - although technically it would be more secure as if the password was mis-typed then  the user should know the information to log in again
+- also maybe make the reset function clear all variables that were entered past a certain point
+    - technically it should be secure as is cause the variables are only accessed via functions that overwrite them
+    - but it just feels weird having the account number variable still be the account number of the last account that was logged in while the atm is idle
+- add some kind of "cancel" button for multiple-step interactions
+ */

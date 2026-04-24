@@ -94,17 +94,17 @@ public class BankAccount implements Serializable{
         balance = i;
     }
 
-    public boolean checkAccountNumber(String s) {
+    protected boolean checkAccountNumber(String s) {
         return(s.equals(getAccountNumber()));
     }
-    public boolean checkPassword(String s) {
+    protected boolean checkPassword(String s) {
         return(s.equals(getAccountPassword()));
     }
 
     //temporary change password
-    public boolean changePassword(String prevPassword, String newPassword) {
-        if (checkPassword(prevPassword) && !checkPassword(newPassword)) {
-            setAccountPassword(newPassword);
+    protected boolean changePassword(String s) {
+        setAccountPassword(s);
+        if (checkPassword(s)) {
             return true;
         }
         else {
