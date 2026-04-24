@@ -74,12 +74,21 @@ public class Bank implements Serializable{
         // Search the accounts array to find a BankAccount with a matching accountNumber and password.
         // - If found, set 'loggedInAccount' to that account and return true.
         // - If not found, reset 'loggedInAccount' to null and return false.
+
+        // when the bank accounts are stored in an array with empty slots at the end, this causes an error because it still tries to check the empty slots
+        // so it has a "b cannot be null" error
+        // this isn't a problem in any version where the bank account objects are stored in an arraylist, which is what we want to end up using
+        // but i'm adding an "if b not null" line here anyway
+        // it might be good to delete that in the final version though
+
         for (BankAccount b: accounts) {
-            if (b.checkAccountNumber(accountNumber) && b.checkPassword(password)) {
-                // found the right account
-                loggedInAccount = b;
-                loggedInAccount.accessDate();
-                return true;
+            if (b != null) {
+                if (b.checkAccountNumber(accountNumber) && b.checkPassword(password)) {
+                    // found the right account
+                    loggedInAccount = b;
+                    loggedInAccount.accessDate();
+                    return true;
+                }
             }
         }
         // not found - return false
