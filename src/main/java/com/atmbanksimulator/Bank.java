@@ -173,9 +173,9 @@ public class Bank implements Serializable {
     }
 
     // attempt to change password of the logged-in account
-    public boolean changePassword(String prevPass, String newPass) {
+    public boolean changePassword(String p) {
         if (loggedIn()) {
-            return loggedInAccount.changePassword(prevPass, newPass);
+            return loggedInAccount.changePassword(p);
         }
         else {
             return false;
@@ -185,6 +185,15 @@ public class Bank implements Serializable {
     public boolean checkPassword(String p) {
         if (loggedIn()) {
             return loggedInAccount.checkPassword(p);
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean validatePassword(String p) {
+        if (loggedIn() && /*enter password rules here*/ true) {
+            return true;
         }
         else {
             return false;
