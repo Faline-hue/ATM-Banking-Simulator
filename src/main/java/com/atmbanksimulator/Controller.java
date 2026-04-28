@@ -32,7 +32,7 @@ public class Controller {
             case "Bal":
                 UIModel.processBalance();
                 break;
-            case "Fin":
+            case "Sign-Out":
                 UIModel.processFinish();
                 break;
             default:
@@ -40,7 +40,16 @@ public class Controller {
                 break;
         }
     }
-
+    void mouseClick( String action) {
+        switch (action) {
+            case "acc":
+                UIModel.processClick("acc");
+                break;
+            case "pass":
+                UIModel.processClick("pass");
+                break;
+        }
+    }
 }
 
 

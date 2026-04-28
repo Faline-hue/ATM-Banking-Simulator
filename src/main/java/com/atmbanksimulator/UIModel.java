@@ -25,8 +25,19 @@ public class UIModel {
     private final String STATE_PASSWORD = "password";     // 2. Waiting for a password
     private final String STATE_LOGGED_IN = "logged_in";   // 3. Logged in (ready to process requests)
 
+    // New states:
+    // The ATM UIModel can be in one of these states:
+    private final String STATE_WELCOME_PAGE = "welcome";    // 1. Default page upon start up, returns here after goodbye page
+    private final String STATE_SIGNIN_PAGE = "Sign_In";     // 2. Sign-In page, waiting for account number and password
+    private final String STATE_MAINMENU_PAGE = "Main_Menu"; // 3. Logged in (awaiting choice)
+    private final String STATE_WITHDRAW_PAGE = "Withdraw";  // 4. Waiting for user to select amount to withdraw
+    private final String STATE_DEPOSIT_PAGE = "Deposit";    // 5. Waiting for user to enter amount to deposit
+    private final String STATE_BALANCE_PAGE = "Balance";    // 6. Showing balance of currently logged in account
+    private final String STATE_CHANGE_PASS = "Change_Pass"; // 7. Sign-In page, allows user to change password
+
+
     // Variables representing the state and data of the ATM UIModel
-    private String state = STATE_ACCOUNT_NO;    // Current state of the ATM
+    private String state = STATE_SIGNIN_PAGE;    // Current state of the ATM
     private String accNumber = "";              // Account number being typed
     private String accPasswd = "";              // Password being typed
 
@@ -45,10 +56,10 @@ public class UIModel {
     // - Clear the numberPadInput - numbers displayed in the TextField
     // - Display the welcome message and user instructions
     public void initialise() {
-        setState(STATE_ACCOUNT_NO);
+        setState(STATE_SIGNIN_PAGE);
         numberPadInput = "";
-        message = "Welcome to the ATM";
-        result = "Enter your account number\nFollowed by \"Ent\"";
+        message = "Sign-In";
+        result = "Enter your Account Number and Password";
         update();
     }
 
@@ -57,10 +68,10 @@ public class UIModel {
     // - Clear the numberPadInput
     // - Display the provided message and user instructions
     private void reset(String msg) {
-        setState(STATE_ACCOUNT_NO);
+        setState(STATE_SIGNIN_PAGE);
         numberPadInput = "";
-        message = msg;
-        result = "Enter your account number\nFollowed by \"Ent\"";
+        message = "Sign-In";
+        result = msg;
     }
 
     // Change the ATM state and print a debug message whenever the state changes
@@ -83,7 +94,7 @@ public class UIModel {
         // Improve feedback by showing what the number is being entered for based on the current state.
         // e.g.  if state is STATE_ACCOUNT_NO, display "Receiving Account Number, Beep 5 received"
         numberPadInput += numberOnButton;
-        message = "Beep! " + numberOnButton + " received";
+        //message = "Beep! " + numberOnButton + " received";
         update();
     }
 
@@ -108,7 +119,7 @@ public class UIModel {
         // The action depends on the current ATM state
         switch ( state )
         {
-            case STATE_ACCOUNT_NO:
+            /*case STATE_ACCOUNT_NO:
                 // Waiting for a complete account number
                 // If nothing was entered, reset with "Invalid Account Number"
                 if (numberPadInput.equals("")) {
@@ -124,26 +135,32 @@ public class UIModel {
                     message = "Account Number Accepted";
                     result = "Now enter your password\nFollowed by \"Ent\"";
                 }
-                break;
+                break;*/
 
-            case STATE_PASSWORD:
-                    // Waiting for a password
-                    // Save the typed number as accPasswd, clear numberPadInput,
-                    // then contact the bank to attempt login
+            case STATE_SIGNIN_PAGE:
+                    // Waiting for user's account details
+                    // Will attempt to log in with given details
                 accPasswd = numberPadInput;
                 numberPadInput = "";
                 if ( bank.login(accNumber, accPasswd) )
                 {
-                    // Successful login: change state to STATE_LOGGED_IN and provide instructions
-                    setState(STATE_LOGGED_IN);
-                    message = "Logged In";
-                    result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                    // Successful login: change state to STATE_MAINMENU_PAGE and provide instructions
+                    setState(STATE_MAINMENU_PAGE);
+                    hideScene();
+                    view.mainMenu(View.stage);
+                    message = "Main Menu";
+                    result = "Please select the option you would like to access";
+
                 } else {
                     // Login failed: reset ATM and display error
                     message = "Login failed: Unknown Account/Password";
+                    System.out.println(accNumber + " " + accNumber);
                     reset(message);
                 }
                 break;
+
+            case STATE_MAINMENU_PAGE:
+                    // Waiting for user to select option
 
             case STATE_LOGGED_IN:
             default:
@@ -285,9 +302,10 @@ public class UIModel {
     // - If the user is logged in, log out
     // - Otherwise, reset the ATM and display an error message
     public void processFinish() {
-        if (state.equals(STATE_LOGGED_IN) ) {
+        if (state.equals(STATE_MAINMENU_PAGE) ) {
             reset("Thank you for using the Bank ATM");
             bank.logout();
+            view.signInPage(View.stage);
         } else {
             reset("You are not logged in");
         }
@@ -301,9 +319,28 @@ public class UIModel {
         update();
     }
 
+    // Handle clicking on text field during sign-in:
+    public void processClick(String action){
+        switch (action){
+            case "acc":
+                accPasswd = numberPadInput;
+                break;
+            case "pass":
+                accNumber = numberPadInput;
+                break;
+        }
+        numberPadInput = "";
+        update();
+    }
+
     // Notify the View of changes by calling its update method
     private void update() {
         view.update(message,numberPadInput, result);
+    }
+
+    // Hide previous scene
+    private void hideScene() {
+        view.hideScene();
     }
 
     // Writes the accounts array list to JSON file - Readable for testing

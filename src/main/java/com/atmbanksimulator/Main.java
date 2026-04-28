@@ -2,22 +2,20 @@ package com.atmbanksimulator;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.Scanner;
 
 // Follows the MVC model - Model View Controller
 
 public class Main extends Application {
     public static void main( String args[] ) {launch(args);}
 
+
     public void start(Stage window) {
+        // Make a stage variable
+        View.getWindow(window);
+
         // Creates a Bank
         Bank bank = new Bank();
 
