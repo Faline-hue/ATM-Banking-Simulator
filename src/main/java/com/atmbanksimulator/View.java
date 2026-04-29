@@ -40,6 +40,7 @@ class View {
     private GridPane grid;      // Main layout container (grid-based)
     private TilePane buttonPane;// Container for ATM keypad buttons (tiled layout)
     private Label dateMsg;      // To display current date
+    private Button btnWD;       // Send Withdraw data
 
 
 
@@ -163,7 +164,12 @@ class View {
         Button b = ((Button) event.getSource());
         String text = b.getText();   // get the button label
         System.out.println( "View::buttonClicked: label = "+ text );
-        controller.process( text );  // Pass it to the controller's process method
+        if (event.getSource().equals(btnWD)){
+            System.out.println("BTN WD");
+            controller.processWithdraw( text ); // Pass it to the controller's  process withdraw method
+        } else {
+            controller.process( text );  // Pass it to the controller's process method
+        }
     }
 
 
@@ -354,26 +360,28 @@ class View {
         menuPane.setPrefColumns(2);
         menuPane.setPrefRows(3);
         menuPane.setMaxWidth(500);
+        menuPane.setHgap(60);
         // Define the button layout as a 2D array of text labels.
         // Empty strings ("") represent blank spaces in the grid.
-        String buttonTexts[][] = {
-                {"£10",  "£20"},
-                {"£50", "£75"},
-                {"£100", "£200"}};
+        String withdrawButtons[][] = {
+                {"£10", "", "£20"},
+                {"£50", "", "£75"},
+                {"£100", "",  "£200"},
+                {"£500", "",  "Custom"}};
 
         // Build the menu panel, loop through the array,
         // - For non-empty strings, create a Button
         // - For empty strings, add an empty Text element as a spacer
         // Add all elements to the menuPane (a tiled pane),
         // then place the menuPane into the main grid.
-        for ( String[] row: buttonTexts ) {
+        for ( String[] row: withdrawButtons ) {
             for (String text: row) {
                 if ( !text.isEmpty() ) {
                     // non-empty string - make a button
-                    Button btn = new Button( text );
-                    btn.setOnAction( this::buttonClicked );
+                    btnWD = new Button( text );
+                    btnWD.setOnAction( this::buttonClicked );
                     // Register event handler: call buttonClicked() whenever this button is pressed
-                    menuPane.getChildren().add( btn );    // add this button to tiled pane
+                    menuPane.getChildren().add( btnWD );    // add this button to tiled pane
                 } else {
                     // empty string - make an empty Text element as a spacer
                     menuPane.getChildren().add( new Text() );
@@ -387,9 +395,9 @@ class View {
         grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
 
         // add the complete GUI to the window and display it
-        Scene maMenu = new Scene(grid, W, H);
-        maMenu.getStylesheets().add("atm.css"); // tell to use our CSS file
-        window.setScene(maMenu);
+        Scene withdraws = new Scene(grid, W, H);
+        withdraws.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(withdraws);
     }
 
     // Hides previous scene

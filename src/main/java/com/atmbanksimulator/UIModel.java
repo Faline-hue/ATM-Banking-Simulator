@@ -36,6 +36,7 @@ public class UIModel {
     private final String STATE_DEPOSIT_PAGE = "Deposit";    // 5. Waiting for user to enter amount to deposit
     private final String STATE_BALANCE_PAGE = "Balance";    // 6. Showing balance of currently logged in account
     private final String STATE_CHANGE_PASS = "Change_Pass"; // 7. Sign-In page, allows user to change password
+    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 7. Sign-In page, allows user to change password
 
 
     // Variables representing the state and data of the ATM UIModel
@@ -72,11 +73,12 @@ public class UIModel {
     private void reset(String msg) {
         bank.logout();
         setState(STATE_SIGNIN_PAGE);
+        view.signInPage(View.stage);
         accNumber = "";
         accPasswd = "";
         numberPadInput = "";
         message = "Sign-In";
-        result = msg;
+        result = "An error has occured, \n please Sign-in again";
     }
 
     // Change the ATM state and print a debug message whenever the state changes
@@ -95,11 +97,7 @@ public class UIModel {
 
     // Handle a number button press: append the digit to numberPadInput
     public void processNumber(String numberOnButton) {
-        // Optional extension:
-        // Improve feedback by showing what the number is being entered for based on the current state.
-        // e.g.  if state is STATE_ACCOUNT_NO, display "Receiving Account Number, Beep 5 received"
         numberPadInput += numberOnButton;
-        //message = "Beep! " + numberOnButton + " received";
         update();
     }
 
@@ -117,31 +115,12 @@ public class UIModel {
 
     // Handle the Enter button.
     // This is a more complex method: pressing Enter causes the ATM to change state,
-    // progressing from STATE_ACCOUNT_NO → STATE_PASSWORD → STATE_LOGGED_IN,
-    // and back to STATE_ACCOUNT_NO when logging out.
+    // progressing from STATE_SIGNIN_PAGE → STATE_MAINMENU_PAGE,
     public void processEnter()
     {
         // The action depends on the current ATM state
         switch ( state )
         {
-            /*case STATE_ACCOUNT_NO:
-                // Waiting for a complete account number
-                // If nothing was entered, reset with "Invalid Account Number"
-                if (numberPadInput.equals("")) {
-                    message = "Invalid Account Number";
-                    reset(message);
-                }
-                else{
-                    // Save the entered number as accNumber, clear numberPadInput,
-                    // update the state to expect password, and provide instructions
-                    accNumber = numberPadInput;
-                    numberPadInput = "";
-                    setState(STATE_PASSWORD);
-                    message = "Account Number Accepted";
-                    result = "Now enter your password\nFollowed by \"Ent\"";
-                }
-                break;*/
-
             case STATE_SIGNIN_PAGE:
                     // Waiting for user's account details
                     // Will attempt to log in with given details
@@ -200,6 +179,34 @@ public class UIModel {
         update(); // Refresh the GUI to show messages and input
     }
 
+    // Handle Main Menu selection
+    // Complex method: selecting a menu option causes the ATM to change state,
+    // progressing from STATE_MAINMENU_PAGE → a process stage, or back to Main Menu from process
+    public void stageManager(String action){
+        // The action is the button input
+        switch (action) {
+            case "Withdraw":
+                setState(STATE_WITHDRAW_PAGE);
+                hideScene();
+                view.withdraws(View.stage);
+                message = "Select Amount";
+                result = "How much would you like to withdraw?";
+                break;
+            case "Deposit":
+                setState(STATE_DEPOSIT_PAGE);
+                break;
+            case "Balance":
+                setState(STATE_BALANCE_PAGE);
+                break;
+            case "Change Password":
+                setState(STATE_CHANGE_PASS);
+                break;
+            case "Sign-Out":
+                setState(STATE_GOODBYE_PAGE);
+                break;
+        }
+        update();
+    }
     /**
      * Parses a string into a valid transaction amount.
      * - If the string is empty, invalid, or consists only of zeros, returns 0.
@@ -269,6 +276,37 @@ public class UIModel {
                     }
                 }
                 else{
+                    message = "Invalid Amount";
+                    result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                }
+                numberPadInput = "";
+                break;
+            case STATE_WITHDRAW_PAGE:
+                int amount = 0;
+                if (action != "Custom") {
+                    System.out.println(action);
+                    amount = Integer.parseInt(action.replace("£", ""));
+                }
+                if (amount > 0) {
+                    if (bank.withdraw(amount)) {
+                        message = "Withdraw Successful";
+                        result = "Withdrawn: " + numberPadInput;
+                    } else if (!bank.withdraw(amount)) {
+                        if (bank.getDailyCap() == bank.getWithdrawalLimit()) {
+                            message = "Withdraw Failed: You've reached your withdraw limit for the day";
+                            result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                        } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCap())) {
+                            message = "Withdraw Failed: You can only withdraw " + bank.getLimit() + " more today";
+                            result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                        } else {
+                            message = "Withdraw Failed: Insufficient Funds";
+                            result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                        }
+                    } else {
+                        message = "Withdraw Failed: Insufficient Funds";
+                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                    }
+                } else {
                     message = "Invalid Amount";
                     result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
                 }
