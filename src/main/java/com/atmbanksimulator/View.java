@@ -40,6 +40,7 @@ class View {
     private GridPane grid;      // Main layout container (grid-based)
     private TilePane buttonPane;// Container for ATM keypad buttons (tiled layout)
     private Label dateMsg;      // To display current date
+    private Button btnWD;       // Send Withdraw data
 
 
 
@@ -163,7 +164,12 @@ class View {
         Button b = ((Button) event.getSource());
         String text = b.getText();   // get the button label
         System.out.println( "View::buttonClicked: label = "+ text );
-        controller.process( text );  // Pass it to the controller's process method
+        if (event.getSource().equals(btnWD)){
+            System.out.println("BTN WD");
+            controller.processWithdraw( text ); // Pass it to the controller's  process withdraw method
+        } else {
+            controller.process( text );  // Pass it to the controller's process method
+        }
     }
 
 
@@ -357,7 +363,7 @@ class View {
         menuPane.setHgap(60);
         // Define the button layout as a 2D array of text labels.
         // Empty strings ("") represent blank spaces in the grid.
-        String buttonTexts[][] = {
+        String withdrawButtons[][] = {
                 {"£10", "", "£20"},
                 {"£50", "", "£75"},
                 {"£100", "",  "£200"},
@@ -368,14 +374,14 @@ class View {
         // - For empty strings, add an empty Text element as a spacer
         // Add all elements to the menuPane (a tiled pane),
         // then place the menuPane into the main grid.
-        for ( String[] row: buttonTexts ) {
+        for ( String[] row: withdrawButtons ) {
             for (String text: row) {
                 if ( !text.isEmpty() ) {
                     // non-empty string - make a button
-                    Button btn = new Button( text );
-                    btn.setOnAction( this::buttonClicked );
+                    btnWD = new Button( text );
+                    btnWD.setOnAction( this::buttonClicked );
                     // Register event handler: call buttonClicked() whenever this button is pressed
-                    menuPane.getChildren().add( btn );    // add this button to tiled pane
+                    menuPane.getChildren().add( btnWD );    // add this button to tiled pane
                 } else {
                     // empty string - make an empty Text element as a spacer
                     menuPane.getChildren().add( new Text() );

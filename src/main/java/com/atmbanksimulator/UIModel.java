@@ -70,9 +70,10 @@ public class UIModel {
     // - Display the provided message and user instructions
     private void reset(String msg) {
         setState(STATE_SIGNIN_PAGE);
+        view.signInPage(View.stage);
         numberPadInput = "";
         message = "Sign-In";
-        result = msg;
+        result = "An error has occured, \n please Sign-in again";
     }
 
     // Change the ATM state and print a debug message whenever the state changes
@@ -215,6 +216,7 @@ public class UIModel {
         if (state.equals(STATE_WITHDRAW_PAGE)) {
             int amount = 0;
             if (action != "Custom") {
+                System.out.println(action);
                 amount = Integer.parseInt(action.replace("£", ""));
             }
             if (amount > 0) {
