@@ -249,11 +249,12 @@ public class UIModel {
     //  - If the user has insufficient funds it will fail and notify them
     // - otherwise, reset the ATM and display an error message.
     // - Reads the amount from numberPadInput, validates it, and updates messages/results accordingly.
-    public void processWithdraw() {
+    public void processWithdraw(String action) {
+        int amount;
         switch (state) {
             case STATE_CHANGE_PASSWORD: break;
             case STATE_LOGGED_IN:
-                int amount = parseValidAmount(numberPadInput);
+                amount = parseValidAmount(numberPadInput);
                 if (amount > 0) {
                     if(bank.withdraw( amount )){
                         message = "Withdraw Successful";
@@ -282,7 +283,7 @@ public class UIModel {
                 numberPadInput = "";
                 break;
             case STATE_WITHDRAW_PAGE:
-                int amount = 0;
+                amount = 0;
                 if (action != "Custom") {
                     System.out.println(action);
                     amount = Integer.parseInt(action.replace("£", ""));
