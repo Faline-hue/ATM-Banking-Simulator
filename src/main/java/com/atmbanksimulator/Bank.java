@@ -23,6 +23,7 @@ public class Bank implements Serializable {
 
     // Instance variables storing bank information
     List<BankAccount> accounts = new ArrayList<BankAccount>();        // Array to hold BankAccount objects
+    private String largestAccountNumber = null;
     private BankAccount loggedInAccount = null;                                  // Currently logged-in account ('null' if no one is logged in)
 
     // A method to create new BankAccount - this is known as a 'factory method' and is a more
@@ -35,6 +36,10 @@ public class Bank implements Serializable {
         return new StudentAccount(accNumber, accPasswd, balance);
     }
 
+    public BankAccount makePrimeAccount(String accNumber, String accPasswd, int balance){
+        return new PrimeAccount(accNumber, accPasswd, balance);
+    }
+
     // A method to add a new bank account to the bank - it returns true if it succeeds
     // or false if it fails (because the bank is 'full')
     public boolean addBankAccount(BankAccount a) {
@@ -42,6 +47,7 @@ public class Bank implements Serializable {
             accounts.add(a); // adds new account
             Collections.sort(accounts,
                     (o1, o2) -> o1.getAccountNumber().compareTo(o2.getAccountNumber()));
+            largestAccountNumber = accounts.getLast().getAccountNumber();
             return true;
         } else {
             return false;
@@ -58,6 +64,7 @@ public class Bank implements Serializable {
         return switch (accType) {
             case "Basic" -> addBankAccount(makeBankAccount(accNumber, accPasswd, balance));
             case "Student" -> addBankAccount(makeStudentAccount(accNumber, accPasswd, balance));
+            case "Prime" -> addBankAccount(makePrimeAccount(accNumber, accPasswd, balance));
             default -> false;
         };
     }
@@ -219,4 +226,22 @@ public class Bank implements Serializable {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean createNewAccount(String p, String t){
+        // banks assign account numbers automatically -- current largest account number stored as a private variable to keep it separate to password
+        // then increment it to be the number for this new account "n"
+        // passwords should be checked to be the same before this is called
+        // this validates the password based on rules, if it's valid then it uses it as the password, otherwise it does not create the account and returns this as false
+        // if (validatePassword(p)){
+        // if the password is valid:
+        // return addBankAccount(n, p, 0, t);
+        // else {
+        return false;
+    }
 }
+
+
+/*
+- the way of sorting the accounts in the arraylist could be a problem after a while
+- because i think it's sorting alphabetically? because the account numbers are stored as strings
+ */
