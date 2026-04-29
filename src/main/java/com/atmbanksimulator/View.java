@@ -15,8 +15,8 @@ import java.time.*;
 // it only updates the display when notified by the UIModel.
 
 class View {
-    int H = 650;         // Height of window pixels
-    int W = 750;         // Width  of window pixels
+    int H = 700;         // Height of window pixels
+    int W = 900;         // Width  of window pixels
 
     Controller controller; // Reference to the Controller (part of the MVC setup)
 
@@ -37,19 +37,26 @@ class View {
     private Button enter;       // Send data
     private TextArea taResult;  // Output area where instructions and results are displayed
     private ScrollPane scrollPane; // Provides scrollbars around the TextArea
-    private GridPane grid;      // Main layout container (grid-based)
-    private TilePane buttonPane;// Container for ATM keypad buttons (tiled layout)
+    private GridPane grid;      // Main layout container (grid-based)       < using
+    private TilePane buttonPane;// Container for ATM keypad buttons (tiled layout)      < using
     private Label dateMsg;      // To display current date
     private Button btnWD;       // Send Withdraw data
 
+    private Pane screenArea;    // To put the changeable screens in later
 
+    private GridPane welcomeScreen;
+    private GridPane signInScreen;
+    // etc
 
     // start() is called from Main to set up the UI.
     // Important: Controls are created here so everything is initialised in the correct order
     public void start(Stage window) {
 
+        welcomeScreen = welcomeScreen();
+        machineLayout(window);
+        setScreen(welcomeScreen);
 
-        signInPage(window);
+        //signInPage(window);
         /*
         // Create the user interface component objects.
         // The ATM UI is organised as a vertical grid with four main parts:
@@ -118,7 +125,7 @@ class View {
         window.show();
         */
     }
-    public TilePane pinPad(){
+    private TilePane pinPad(){
         // Create pin pad
         buttonPane = new TilePane(); //
         buttonPane.setId("Buttons"); // CSS ID
@@ -172,7 +179,44 @@ class View {
         }
     }
 
+    // this method creates the main layout of the atm that doesn't change later
+    public void machineLayout(Stage window){
+        // create the number pad (same one used throughout), an empty pane for the screen, and a gridpane to hold them both in the scene
+        buttonPane = pinPad();
+        screenArea = new Pane();
+        //screenArea.setStyle("-fx-background-color: black;");
+        screenArea.setPrefSize(800,400);
 
+        grid = new GridPane();
+        grid.setId("machine");
+
+        grid.setPadding(new Insets(10,10,10,10));   // setting padding
+        grid.setVgap(10);   // setting gaps between columns and rows
+        grid.setHgap(10);
+        grid.setAlignment(Pos.CENTER);  // setting grid alignment
+        grid.setGridLinesVisible(true);
+
+        grid.add(buttonPane,0,1);   // adding both to grid
+        grid.add(screenArea, 0, 0);
+
+        Scene layout = new Scene(grid, W, H);
+        layout.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(layout);
+        window.setTitle("ATM-Bank Simulator"); //set window title
+        window.show();
+    }
+
+    private GridPane welcomeScreen(){
+        GridPane gp = new GridPane();
+        gp.setGridLinesVisible(true);
+        gp.add(new Label("welcome screen"), 0, 0);
+
+        return gp;
+    }
+
+    private void setScreen(GridPane gp){
+        screenArea.getChildren().addAll(gp);
+    }
 
     // This method is called when the user passes the welcome page.
     // Fills in the contents of the scene to create a sign-in page
@@ -412,7 +456,7 @@ class View {
     // - taResultMsg → shown in the text area (instructions / results)
     public void update(String msg,String tfInputMsg,String taResultMsg)
     {
-        laMsg.setText(msg);
+        /*laMsg.setText(msg);
         if (tfSelect == "accountNum"){
             accNum.setText(tfInputMsg);     // Account number update
         } else if (tfSelect == "password"){
@@ -424,5 +468,6 @@ class View {
 
         LocalDate currentDate = LocalDate.now(); // Creates a date object with the current date
         //dateMsg.setText(String.valueOf(currentDate)); // Assigns the current date to the label
+        */
     }
 }
