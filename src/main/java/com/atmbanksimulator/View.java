@@ -354,12 +354,14 @@ class View {
         menuPane.setPrefColumns(2);
         menuPane.setPrefRows(3);
         menuPane.setMaxWidth(500);
+        menuPane.setHgap(60);
         // Define the button layout as a 2D array of text labels.
         // Empty strings ("") represent blank spaces in the grid.
         String buttonTexts[][] = {
-                {"£10",  "£20"},
-                {"£50", "£75"},
-                {"£100", "£200"}};
+                {"£10", "", "£20"},
+                {"£50", "", "£75"},
+                {"£100", "",  "£200"},
+                {"£500", "",  "Custom"}};
 
         // Build the menu panel, loop through the array,
         // - For non-empty strings, create a Button
@@ -387,9 +389,9 @@ class View {
         grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
 
         // add the complete GUI to the window and display it
-        Scene maMenu = new Scene(grid, W, H);
-        maMenu.getStylesheets().add("atm.css"); // tell to use our CSS file
-        window.setScene(maMenu);
+        Scene withdraws = new Scene(grid, W, H);
+        withdraws.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(withdraws);
     }
 
     // Hides previous scene
