@@ -24,6 +24,8 @@ public class UIModel {
     private final String STATE_ACCOUNT_NO = "account_no"; // 1. Waiting for an account number
     private final String STATE_PASSWORD = "password";     // 2. Waiting for a password
     private final String STATE_LOGGED_IN = "logged_in";   // 3. Logged in (ready to process requests)
+    // i added this state:
+    private final String STATE_CHANGE_PASSWORD = "change_password";
 
     // New states:
     // The ATM UIModel can be in one of these states:
@@ -68,7 +70,10 @@ public class UIModel {
     // - Clear the numberPadInput
     // - Display the provided message and user instructions
     private void reset(String msg) {
+        bank.logout();
         setState(STATE_SIGNIN_PAGE);
+        accNumber = "";
+        accPasswd = "";
         numberPadInput = "";
         message = "Sign-In";
         result = msg;
@@ -158,10 +163,35 @@ public class UIModel {
                     reset(message);
                 }
                 break;
+            case STATE_CHANGE_PASSWORD:
+                accPasswd = numberPadInput;
+                numberPadInput = "";
+                if (accPasswd.isEmpty()) {
+                    message = "Input empty";
+                    result = "Password not changed; type new password and press 'enter'"; // <- also needs to explain new password rules
+                }
+                else if (bank.validatePassword(accPasswd)) {
+                    if (bank.changePassword(accPasswd)) {
+                        message = "Password changed";
+                        result = "Valid password entered; please keep track of your new password and use it to log in in future";
+                        save();
+                        saveRead();
+                    }
+                    else {
+                        message = "Password not changed";
+                        result = "Input was valid but another error occurred; your previous password will still be used to log in";
+                    }
+                    setState(STATE_LOGGED_IN); // change to logged-in state if valid password was entered, whether or not password was changed
+                    // if password wasn't changed for a different reason to the input not being valid, entering new input won't help
+                }
+                else {
+                    message = "Password not changed";
+                    result = "Invalid input; please enter new password and press 'enter'"; // also explain password rules
+                }
+                break;
 
             case STATE_MAINMENU_PAGE:
                     // Waiting for user to select option
-
             case STATE_LOGGED_IN:
             default:
                 // Do nothing for other states (user is already logged in)
@@ -193,12 +223,15 @@ public class UIModel {
     // - If the user is logged in, retrieve the current balance and update messages/results accordingly
     // - Otherwise, reset the ATM and display an error message
     public void processBalance() {
-        if (state.equals(STATE_LOGGED_IN) ) {
-            numberPadInput = "";
-            message = "Balance Available";
-            result = "Your Balance is: " + bank.getBalance();
-        } else {
-            reset("You are not logged in");
+        switch (state) {
+            case STATE_CHANGE_PASSWORD: break;
+            case STATE_LOGGED_IN:
+                numberPadInput = "";
+                message = "Balance Available";
+                result = "Your Balance is: " + bank.getBalance();
+                break;
+            default:
+                reset("You are not logged in");
         }
         update();
     }
@@ -210,36 +243,38 @@ public class UIModel {
     // - otherwise, reset the ATM and display an error message.
     // - Reads the amount from numberPadInput, validates it, and updates messages/results accordingly.
     public void processWithdraw() {
-        if (state.equals(STATE_LOGGED_IN)) {
-            int amount = parseValidAmount(numberPadInput);
-            if (amount > 0) {
-                if(bank.withdraw( amount )){
-                    message = "Withdraw Successful";
-                    result = "Withdrawn: " + numberPadInput;
-                }
-                else if(!bank.withdraw( amount)){
-                    if(bank.getDailyCap() == bank.getWithdrawalLimit()){
-                        message = "Withdraw Failed: You've reached your withdraw limit for the day";
-                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
-                    } else if(amount > (bank.getWithdrawalLimit() - bank.getDailyCap())){
-                        message = "Withdraw Failed: You can only withdraw " + bank.getLimit() + " more today";
-                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+        switch (state) {
+            case STATE_CHANGE_PASSWORD: break;
+            case STATE_LOGGED_IN:
+                int amount = parseValidAmount(numberPadInput);
+                if (amount > 0) {
+                    if(bank.withdraw( amount )){
+                        message = "Withdraw Successful";
+                        result = "Withdrawn: " + numberPadInput;
+                    }
+                    else if(!bank.withdraw( amount)){
+                        if(bank.getDailyCap() == bank.getWithdrawalLimit()){
+                            message = "Withdraw Failed: You've reached your withdraw limit for the day";
+                            result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                        } else if(amount > (bank.getWithdrawalLimit() - bank.getDailyCap())){
+                            message = "Withdraw Failed: You can only withdraw " + bank.getLimit() + " more today";
+                            result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                        } else {
+                            message = "Withdraw Failed: Insufficient Funds";
+                            result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                        }
                     } else {
                         message = "Withdraw Failed: Insufficient Funds";
                         result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
                     }
-                } else {
-                    message = "Withdraw Failed: Insufficient Funds";
+                }
+                else{
+                    message = "Invalid Amount";
                     result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
                 }
-            }
-            else{
-                message = "Invalid Amount";
-                result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
-            }
-            numberPadInput = "";
-        }
-        else {
+                numberPadInput = "";
+                break;
+            default:
             reset("You are not logged in");
         }
         save(); //- Will save data to a serialized file for loading
@@ -252,48 +287,53 @@ public class UIModel {
     // - Reads the amount from numberPadInput, validates it, and updates messages/results accordingly
     // - Otherwise, reset the ATM and display an error message
     public void processDeposit() {
-        if (state.equals(STATE_LOGGED_IN)) {
-            int amount = parseValidAmount(numberPadInput);
-            if (amount > 0) {
-                bank.deposit( amount );
-                message = "Deposit Successful";
-                result = "Deposited: " + numberPadInput;
-            }
-            else {
-                message = "Invalid Amount";
-                result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
-            }
-            numberPadInput = "";
-        }
-        else {
-            reset("You are not logged in");
+        switch (state) {
+            case STATE_CHANGE_PASSWORD: break;
+            case STATE_LOGGED_IN:
+                int amount = parseValidAmount(numberPadInput);
+                if (amount > 0) {
+                    bank.deposit(amount);
+                    message = "Deposit Successful";
+                    result = "Deposited: " + numberPadInput;
+                }
+                else {
+                    message = "Invalid Amount";
+                    result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                }
+                numberPadInput = "";
+                break;
+            default:
+                reset("You are not logged in");
         }
         save(); //- Will save data to a serialized file for loading
         saveRead(); // Will save data to a readable file for testing
         update();
     }
 
-    // NOT WORKING YET
-    // possibly change UI because the process of this is really confusing and could cause a lot of problems if a user messes it up
+    // possibly change UI because the process of this is really confusing and could cause problems if a user messes it up
     // Handle the Change Password button:
-    public void processPasswordChange() {
-        if (state.equals(STATE_LOGGED_IN)) {
-            accPasswd = numberPadInput;
-            numberPadInput = "";
-            // at this point the user needs to press enter so possibly need new state to add an effect in processEnter
-            if ( bank.changePassword(accPasswd, numberPadInput) )
-            {
-                // Correct password entered
-                message = "Password correct";
-                result = "Enter new password";
-            } else {
-                // incorrect password entered - not sure whether to log out or not
-                // but bank.changePassword method won't change the password if it's returning false
-                reset("Incorrect password");
-            }
-        }
-        else {
-            reset("You are not logged in");
+    public void processChangePassword() {
+        switch (state) {
+            case STATE_CHANGE_PASSWORD: break;
+            case STATE_LOGGED_IN:
+                accPasswd = numberPadInput;
+                numberPadInput = "";
+                if ( bank.checkPassword(accPasswd) )
+                {
+                    // Correct password entered
+                    setState(STATE_CHANGE_PASSWORD); // changes the state so that when enter is pressed again it will do validate password step
+                    message = "Password correct";
+                    result = "Type new password and press 'enter'"; // explain rules new password must follow somewhere
+                } else {
+                    // incorrect password entered - not sure whether to log out or not
+                    // but bank.changePassword method won't change the state to allow changing password if it's returning false
+                    // reset("Password incorrect, logging out for security reasons") // <- resets to asking for account number, logging the user out
+                    message = "Password incorrect";
+                    result = "Try again or contact the bank for help"; // <- keeps user logged in, lets them enter password again (maybe the better option because if they're logged in they obviously know their password so could be a typo)
+                }
+                break;
+            default:
+                reset("You are not logged in");
         }
         update();
     }
@@ -302,12 +342,18 @@ public class UIModel {
     // - If the user is logged in, log out
     // - Otherwise, reset the ATM and display an error message
     public void processFinish() {
-        if (state.equals(STATE_MAINMENU_PAGE) ) {
-            reset("Thank you for using the Bank ATM");
-            bank.logout();
-            view.signInPage(View.stage);
-        } else {
-            reset("You are not logged in");
+        switch (state) {
+            case STATE_CHANGE_PASSWORD: break;
+            case STATE_LOGGED_IN:
+                reset("Thank you for using the Bank ATM");
+                break;
+            case STATE_MAINMENU_PAGE:
+                reset("Thank you for using the Bank ATM");
+                bank.logout();
+                view.signInPage(View.stage);
+                break;
+            default:
+                reset("You are not logged in");
         }
         update();
     }
@@ -367,4 +413,13 @@ public class UIModel {
         }
     }
 }
-
+/*
+TO DO
+- maybe change reset function to work to reset to different states?
+    - current version has it log out to asking for account number every time
+    - which doesn't seem super helpful in situations like mis-typing the current password when trying to change it
+    - although technically it would be more secure as if the password was mis-typed then  the user should know the information to log in again
+    - don't change reset method for this as it now logs the user out, add new method to go back to previous states if needed
+- add some kind of "cancel" button for multiple-step interactions
+- add methods to validate amounts to withdraw and deposit for individual accounts/account types and use those in the processWithdraw() and processDeposit() methods
+ */

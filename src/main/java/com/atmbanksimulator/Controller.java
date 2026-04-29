@@ -32,6 +32,9 @@ public class Controller {
             case "Bal":
                 UIModel.processBalance();
                 break;
+            case "ChP":
+                UIModel.processChangePassword();
+                break;
             case "Sign-Out":
                 UIModel.processFinish();
                 break;
