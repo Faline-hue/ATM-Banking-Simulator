@@ -41,6 +41,8 @@ public class UIModel {
     private String state = STATE_SIGNIN_PAGE;    // Current state of the ATM
     private String accNumber = "";              // Account number being typed
     private String accPasswd = "";              // Password being typed
+    private String curPasswd = "";              // Current password being type
+    private String newPasswd = "";              // New password being typed
 
     // Variables shown on the View display
     private String message;                // Message label text
@@ -137,7 +139,21 @@ public class UIModel {
                     reset(message);
                 }
                 break;
-
+            case STATE_CHANGE_PASS:
+                    // Waiting for user's password details
+                    // Will confirm password details
+                newPasswd = numberPadInput;
+                numberPadInput = "";
+                if (bank.changePassword(curPasswd, newPasswd)){
+                    // Current password entered correctly
+                    result = "Password successfully updated\nYou may now return to menu";
+                } else if(curPasswd == newPasswd){
+                    // Password isn't new
+                    result = "New password is identical to current password\nPlease enter a new password";
+                }else {
+                    // Current password entered incorrectly
+                    result = "Password incorrect\nPlease ensure current password is correct";
+                }
             default:
                 // Do nothing for other states (user is already logged in)
         }
@@ -163,13 +179,29 @@ public class UIModel {
                 break;
             case "Balance":
                 setState(STATE_BALANCE_PAGE);
+                hideScene();
+                view.balance(View.stage);
+                message = "Your account balance is:";
+                result = Integer.toString(bank.getBalance());
                 break;
             case "Change Password":
                 setState(STATE_CHANGE_PASS);
+                hideScene();
+                view.chngPass(View.stage);
+                message = "Changing Password";
+                result = "Please enter your current password\nand your new password";
+                break;
+            case "Return to menu":
+                setState(STATE_MAINMENU_PAGE);
+                hideScene();
+                view.mainMenu(View.stage);
+                message = "Main Menu";
+                result = "Please select the option you would like to access";
                 break;
             case "Sign-Out":
                 setState(STATE_GOODBYE_PAGE);
                 break;
+
         }
         update();
     }
@@ -221,26 +253,39 @@ public class UIModel {
             }
             if (amount > 0) {
                 if (bank.withdraw(amount)) {
+                    // If balance allows, will return true
                     message = "Withdraw Successful";
-                    result = "Withdrawn: " + numberPadInput;
+                    result = "Withdrawn: " + amount;
                 } else if (!bank.withdraw(amount)) {
-                    if (bank.getDailyCap() == bank.getWithdrawalLimit()) {
-                        message = "Withdraw Failed: You've reached your withdraw limit for the day";
-                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
-                    } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCap())) {
-                        message = "Withdraw Failed: You can only withdraw " + bank.getLimit() + " more today";
-                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                    // If balance doesn't allow, will return false
+                    if (amount > bank.getBalance() ){
+                        // Amount is larger than user's balance
+                        message = "Withdraw Failed";
+                        result = "Insufficient Funds";
                     } else {
-                        message = "Withdraw Failed: Insufficient Funds";
-                        result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                        if (bank.getDailyCap() == bank.getWithdrawalLimit()) {
+                            // Daily withdraw limit is reached
+                            message = "Withdraw Failed";
+                            result = "You've reached your withdraw limit for the day";
+                        } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCap())) {
+                            // Not enough left on user's withdraw limit
+                            message = "Withdraw Failed";
+                            result = "You can only withdraw " + bank.getLimit() + " more today";
+                        } else {
+                            // Fallback statement
+                            message = "Withdraw Failed";
+                            result = "Insufficient Funds";
+                        }
                     }
                 } else {
-                    message = "Withdraw Failed: Insufficient Funds";
-                    result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                    // Fallback statement
+                    message = "Withdraw Failed";
+                    result = "Insufficient Funds";
                 }
             } else {
+                // Fallback in event of error
                 message = "Invalid Amount";
-                result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                result = "An error has occured \nPlease reselect how much you want to withdraw";
             }
             numberPadInput = "";
         }
@@ -282,8 +327,7 @@ public class UIModel {
     // possibly change UI because the process of this is really confusing and could cause a lot of problems if a user messes it up
     // Handle the Change Password button:
     public void processPasswordChange() {
-        if (state.equals(STATE_LOGGED_IN)) {
-            accPasswd = numberPadInput;
+        if (state.equals(STATE_CHANGE_PASS)) {
             numberPadInput = "";
             // at this point the user needs to press enter so possibly need new state to add an effect in processEnter
             if ( bank.changePassword(accPasswd, numberPadInput) )
@@ -332,6 +376,12 @@ public class UIModel {
                 break;
             case "pass":
                 accNumber = numberPadInput;
+                break;
+            case "curpass":
+                curPasswd = numberPadInput;
+                break;
+            case "newpass":
+                newPasswd = numberPadInput;
                 break;
         }
         numberPadInput = "";

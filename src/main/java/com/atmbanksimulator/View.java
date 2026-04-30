@@ -34,9 +34,9 @@ class View {
     private TextField tfInput;  // Input field where numbers typed on the keypad appear
     private TextField accNum;   // Input field for account number
     private TextField paswrd;   // Input field for password
-    private Button enter;       // Send data
+    private TextField newPaswrd;// Input field for password change
+    private Button goBack;       // Send data
     private TextArea taResult;  // Output area where instructions and results are displayed
-    private ScrollPane scrollPane; // Provides scrollbars around the TextArea
     private GridPane grid;      // Main layout container (grid-based)
     private TilePane buttonPane;// Container for ATM keypad buttons (tiled layout)
     private Label dateMsg;      // To display current date
@@ -47,8 +47,6 @@ class View {
     // start() is called from Main to set up the UI.
     // Important: Controls are created here so everything is initialised in the correct order
     public void start(Stage window) {
-
-
         signInPage(window);
         /*
         // Create the user interface component objects.
@@ -164,12 +162,7 @@ class View {
         Button b = ((Button) event.getSource());
         String text = b.getText();   // get the button label
         System.out.println( "View::buttonClicked: label = "+ text );
-        if (event.getSource().equals(btnWD)){
-            System.out.println("BTN WD");
-            controller.processWithdraw( text ); // Pass it to the controller's  process withdraw method
-        } else {
-            controller.process( text );  // Pass it to the controller's process method
-        }
+        controller.process( text );  // Pass it to the controller's process method
     }
 
 
@@ -238,6 +231,7 @@ class View {
         signIn.getStylesheets().add("atm.css"); // tell to use our CSS file
         window.setScene(signIn);
         window.setTitle("ATM-Bank Simulator"); //set window title
+        window.setResizable(false);
         window.show();
     }
 
@@ -379,6 +373,7 @@ class View {
                 if ( !text.isEmpty() ) {
                     // non-empty string - make a button
                     btnWD = new Button( text );
+                    System.out.println(btnWD);
                     btnWD.setOnAction( this::buttonClicked );
                     // Register event handler: call buttonClicked() whenever this button is pressed
                     menuPane.getChildren().add( btnWD );    // add this button to tiled pane
@@ -390,6 +385,12 @@ class View {
         }
         grid.add(menuPane,0,2); // Add the tiled pane of buttons to the main grid
 
+        // Creates a return to menu button
+        goBack = new Button("Return to menu");
+        goBack.setId("return");
+        goBack.setOnAction( this::buttonClicked );
+        grid.add(goBack, 0, 3 );
+
         // Create pin pad
         buttonPane = pinPad();
         grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
@@ -398,6 +399,118 @@ class View {
         Scene withdraws = new Scene(grid, W, H);
         withdraws.getStylesheets().add("atm.css"); // tell to use our CSS file
         window.setScene(withdraws);
+    }
+
+    // This method is called when the user selects Balance
+    public void balance(Stage window){
+        // Creates a Grid Pane
+        grid = new GridPane();  // Page Layout
+        grid.setId("layout");   // CSS ID
+
+        // Setting the padding
+        grid.setPadding(new Insets(25,25,25,25));
+
+        // Setting the vert and hori gaps between the columns
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        // Setting the grid alignment
+        grid.setAlignment(Pos.CENTER);
+
+        // Creates a label title
+        laMsg = new Label("Your account balance is:");     // Title bar at the top
+        laMsg.setId("title");                   // CSS ID for designs
+        grid.add(laMsg, 0, 0);         // Add to GUI at the top
+
+        // Creates a Text Area for instructions
+        //taResult = new TextArea();   // Instructions
+        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setEditable(false);       // Read only
+        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        //scrollPane  = new ScrollPane();    // create a scrolling window
+        //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
+        //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
+        grid.add( taResult, 0, 1);    // Add the scrolling window to GUI on third row
+
+        // Creates a return to menu button
+        goBack = new Button("Return to menu");
+        goBack.setId("return");
+        goBack.setOnAction( this::buttonClicked );
+        grid.add(goBack, 0, 2 );
+
+
+        // Create pin pad
+        buttonPane = pinPad();
+        grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
+
+        // add the complete GUI to the window and display it
+        Scene balance = new Scene(grid, W, H);
+        balance.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(balance);
+    }
+
+    // This method is called when the user chooses to change their password.
+    // Fills in the contents of the scene to create a change password page
+    // - Presents 2 text fields, one to enter old password and another for new password
+    public void chngPass(Stage window){
+        // Creates a Grid Pane
+        grid = new GridPane();  // Page Layout
+        grid.setId("layout");   // CSS ID
+
+        // Setting the padding
+        grid.setPadding(new Insets(25,25,25,25));
+
+        // Setting the vert and hori gaps between the columns
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        // Setting the grid alignment
+        grid.setAlignment(Pos.CENTER);
+
+        // Creates a label title
+        laMsg = new Label("Change Password");   // Title bar at the top
+        laMsg.setId("title");   // CSS ID for designs
+        grid.add(laMsg, 0, 0);         // Add to GUI at the top
+
+        // Creates a Text Area for instructions
+        taResult = new TextArea("Please enter your current password\nand new password");   // Instructions
+        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setEditable(false);       // Read only
+        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        //scrollPane  = new ScrollPane();    // create a scrolling window
+        //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
+        //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
+        grid.add( taResult, 0, 1);    // add the scrolling window to GUI on third row
+
+        // Creates a Text field for inputting account number
+        paswrd = new TextField();     // text field for numbers
+        paswrd.setEditable(false);     // Read only
+        grid.add(paswrd, 0, 2);    // Add to GUI on second row
+        paswrd.setOnMouseClicked(event -> {
+            tfSelect = "current password";
+            controller.mouseClick("curpass");
+        });
+
+        tfInput = new TextField();  // To avoid errors from old code
+
+        // Creates a Text field for inputting account password
+        newPaswrd = new TextField();     // text field for numbers
+        newPaswrd.setEditable(false);     // Read only
+        grid.add(newPaswrd, 0, 3);    // Add to GUI on third row
+        newPaswrd.setOnMouseClicked(event -> {
+            tfSelect = "new password";
+            controller.mouseClick("newpass");
+        });
+
+        // Create pin pad
+        buttonPane = pinPad();
+
+        grid.add(buttonPane,0,4); // add the tiled pane of buttons to the main grid
+
+        // add the complete GUI to the window and display it
+        Scene chngPass = new Scene(grid, W, H);
+        chngPass.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(chngPass);
     }
 
     // Hides previous scene
@@ -417,6 +530,10 @@ class View {
             accNum.setText(tfInputMsg);     // Account number update
         } else if (tfSelect == "password"){
             paswrd.setText(tfInputMsg);     // Password update
+        } else if (tfSelect == "current password"){
+            paswrd.setText(tfInputMsg);     // Password update
+        } else if (tfSelect == "new password"){
+            newPaswrd.setText(tfInputMsg);     // Password update
         } else {
             tfInput.setText(tfInputMsg);    // Number update
         }

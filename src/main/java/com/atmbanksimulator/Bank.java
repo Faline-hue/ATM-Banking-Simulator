@@ -190,12 +190,6 @@ public class Bank implements Serializable {
         return accounts;
     }
 
-    /*public void load() {
-        ObjectMapper mapper = new ObjectMapper();
-        List<BankAccount> jsonList = mapper.readValue(new File("output.json"), new TypeReference<List>(){});
-        accounts = jsonList;
-        System.out.println(accounts);
-    }*/
     public List load() {
         try{
             FileInputStream fis = new FileInputStream("bank.ser");
