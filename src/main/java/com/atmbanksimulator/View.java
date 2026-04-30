@@ -502,10 +502,16 @@ class View {
             controller.mouseClick("newpass");
         });
 
+        // Creates a return to menu button
+        goBack = new Button("Return to menu");
+        goBack.setId("return");
+        goBack.setOnAction( this::buttonClicked );
+        grid.add(goBack, 0, 4 );
+
         // Create pin pad
         buttonPane = pinPad();
 
-        grid.add(buttonPane,0,4); // add the tiled pane of buttons to the main grid
+        grid.add(buttonPane,0,5); // add the tiled pane of buttons to the main grid
 
         // add the complete GUI to the window and display it
         Scene chngPass = new Scene(grid, W, H);

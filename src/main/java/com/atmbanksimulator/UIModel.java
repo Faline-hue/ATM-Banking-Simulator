@@ -13,6 +13,7 @@ package com.atmbanksimulator;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.*;
+import java.util.Objects;
 
 public class UIModel {
     View view; // Reference to the View (part of the MVC setup)
@@ -144,9 +145,12 @@ public class UIModel {
                     // Will confirm password details
                 newPasswd = numberPadInput;
                 numberPadInput = "";
-                if (bank.changePassword(curPasswd, newPasswd)){
+                if (bank.checkPassword(curPasswd)){
                     // Current password entered correctly
+                    bank.changePassword(curPasswd, newPasswd);
                     result = "Password successfully updated\nYou may now return to menu";
+                    saveRead();
+                    save();
                 } else if(curPasswd == newPasswd){
                     // Password isn't new
                     result = "New password is identical to current password\nPlease enter a new password";
@@ -154,6 +158,7 @@ public class UIModel {
                     // Current password entered incorrectly
                     result = "Password incorrect\nPlease ensure current password is correct";
                 }
+                break;
             default:
                 // Do nothing for other states (user is already logged in)
         }
@@ -320,30 +325,6 @@ public class UIModel {
         }
         save(); //- Will save data to a serialized file for loading
         saveRead(); // Will save data to a readable file for testing
-        update();
-    }
-
-    // NOT WORKING YET
-    // possibly change UI because the process of this is really confusing and could cause a lot of problems if a user messes it up
-    // Handle the Change Password button:
-    public void processPasswordChange() {
-        if (state.equals(STATE_CHANGE_PASS)) {
-            numberPadInput = "";
-            // at this point the user needs to press enter so possibly need new state to add an effect in processEnter
-            if ( bank.changePassword(accPasswd, numberPadInput) )
-            {
-                // Correct password entered
-                message = "Password correct";
-                result = "Enter new password";
-            } else {
-                // incorrect password entered - not sure whether to log out or not
-                // but bank.changePassword method won't change the password if it's returning false
-                reset("Incorrect password");
-            }
-        }
-        else {
-            reset("You are not logged in");
-        }
         update();
     }
 

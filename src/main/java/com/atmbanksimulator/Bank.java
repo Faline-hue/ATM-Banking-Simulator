@@ -16,12 +16,6 @@ import java.util.List;
 */
 public class Bank implements Serializable {
 
-    /*
-     ToDO: Optional extension:
-     Improve account management in the Bank class:
-     Refactor addBankAccount and login methods to leverage ArrayList.
-    */
-
     // Instance variables storing bank information
     List<BankAccount> accounts = new ArrayList<BankAccount>();        // Array to hold BankAccount objects
     private BankAccount loggedInAccount = null;                                  // Currently logged-in account ('null' if no one is logged in)
@@ -168,27 +162,38 @@ public class Bank implements Serializable {
     }
 
     // attempt to change password of the logged-in account
-    public boolean changePassword(String prevPass, String newPass) {
+    public void changePassword(String prevPass, String newPass) {
         if (loggedIn()) {
-            return loggedInAccount.changePassword(prevPass, newPass);
+            loggedInAccount.changePassword(prevPass, newPass);
+        }
+    }
+
+    public boolean checkPassword(String p) {
+        if (loggedIn()) {
+            System.out.println("reached check");
+            return loggedInAccount.checkPassword(p);
+
         }
         else {
             return false;
         }
     }
 
-    public boolean checkPassword(String p) {
-        if (loggedIn()) {
-            return loggedInAccount.checkPassword(p);
+    public boolean validatePassword(String p) {
+        if (loggedIn() && /*enter password rules here*/ true) {
+            return true;
         }
         else {
             return false;
         }
     }
+
     // Used to read the array list of accounts in UIModel
     public List json() {
         return accounts;
     }
+
+
 
     public List load() {
         try{

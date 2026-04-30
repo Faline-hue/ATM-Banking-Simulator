@@ -92,13 +92,13 @@ public class BankAccount implements Serializable {
 
     // Temporarily made separate getters and setters for subclasses - I feel like the public account number and password should be different?
     protected void setAccountNumber(String s){
-        accNumber = s;
+        this.accNumber = s;
     }
     protected void setAccountPassword(String s){
-        accPasswd = s;
+        this.accPasswd = s;
     }
     protected void setAccountBalance(int i){
-        balance = i;
+        this.balance = i;
     }
 
     public boolean checkAccountNumber(String s) {
@@ -109,13 +109,9 @@ public class BankAccount implements Serializable {
     }
 
     //temporary change password
-    public boolean changePassword(String prevPassword, String newPassword) {
-        if (checkPassword(prevPassword) && !checkPassword(newPassword)) {
+    public void changePassword(String prevPassword, String newPassword) {
+        if (checkPassword(prevPassword)){
             setAccountPassword(newPassword);
-            return true;
-        }
-        else {
-            return false;
         }
     }
 }
