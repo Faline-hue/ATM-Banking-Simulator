@@ -519,6 +519,61 @@ class View {
         window.setScene(chngPass);
     }
 
+    // This method is called when the user selects Deposit
+    // Fills in the contents of the scene to create a Deposit page
+    //
+    public void deposit(Stage window){
+        // Creates a Grid Pane
+        grid = new GridPane();  // Page Layout
+        grid.setId("layout");   // CSS ID
+
+        // Setting the padding
+        grid.setPadding(new Insets(25,25,25,25));
+
+        // Setting the vert and hori gaps between the columns
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        // Setting the grid alignment
+        grid.setAlignment(Pos.CENTER);
+
+        // Creates a label title
+        laMsg = new Label("Enter amount to deposit");     // Title bar at the top
+        laMsg.setId("title");                   // CSS ID for designs
+        grid.add(laMsg, 0, 0);         // Add to GUI at the top
+
+        // Creates a Text Area for instructions
+        taResult = new TextArea("Please enter the amount you wish to deposit");   // Instructions
+        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setEditable(false);       // Read only
+        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        //scrollPane  = new ScrollPane();    // create a scrolling window
+        //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
+        //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
+        grid.add( taResult, 0, 1);    // Add the scrolling window to GUI on third row
+
+        tfInput = new TextField();
+        tfInput.setId("depositField");
+        tfInput.setEditable(false);     // Read only
+        grid.add(tfInput, 0, 2);
+
+        // Creates a return to menu button
+        goBack = new Button("Return to menu");
+        goBack.setId("return");
+        goBack.setOnAction( this::buttonClicked );
+        grid.add(goBack, 0, 3 );
+
+
+        // Create pin pad
+        buttonPane = pinPad();
+        grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
+
+        // add the complete GUI to the window and display it
+        Scene deposit = new Scene(grid, W, H);
+        deposit.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(deposit);
+    }
+
     // Hides previous scene
     public void hideScene() {
         grid.managedProperty().bind(grid.visibleProperty());
@@ -543,9 +598,10 @@ class View {
         } else {
             tfInput.setText(tfInputMsg);    // Number update
         }
+        tfInput.setText(tfInputMsg);    // Number update
         taResult.setText(taResultMsg);
 
-        LocalDate currentDate = LocalDate.now(); // Creates a date object with the current date
+        // LocalDate currentDate = LocalDate.now(); // Creates a date object with the current date
         //dateMsg.setText(String.valueOf(currentDate)); // Assigns the current date to the label
     }
 }

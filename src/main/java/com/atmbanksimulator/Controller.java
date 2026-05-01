@@ -23,12 +23,6 @@ public class Controller {
             case "Ent":
                 UIModel.processEnter();
                 break;
-            case "Dep":
-                UIModel.processDeposit();
-                break;
-            case "Bal":
-                UIModel.processBalance();
-                break;
             case "Sign-Out":
                 UIModel.processFinish();
                 break;

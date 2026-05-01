@@ -101,9 +101,6 @@ public class UIModel {
 
     // Handle the Clear button: reset the current number stored in numberPadInput
     public void processClear() {
-        // Optional extension:
-        // Improve feedback by showing what was cleared depending on the current state.
-        // e.g. if state is STATE_ACCOUNT_NO, display "Account Number cleared: 123"
         if (!numberPadInput.isEmpty()) {
             numberPadInput = "";
             message = "Input Cleared";
@@ -159,6 +156,11 @@ public class UIModel {
                     result = "Password incorrect\nPlease ensure current password is correct";
                 }
                 break;
+            case STATE_DEPOSIT_PAGE:
+                    // Waiting for user's deposit
+                    // Will confirm daily deposit limit
+                processDeposit();
+
             default:
                 // Do nothing for other states (user is already logged in)
         }
@@ -181,6 +183,10 @@ public class UIModel {
                 break;
             case "Deposit":
                 setState(STATE_DEPOSIT_PAGE);
+                hideScene();
+                view.deposit(View.stage);
+                message = "Enter amount to deposit";
+                result = "Please enter the amount you want to deposit";
                 break;
             case "Balance":
                 setState(STATE_BALANCE_PAGE);
@@ -205,6 +211,7 @@ public class UIModel {
                 break;
             case "Sign-Out":
                 setState(STATE_GOODBYE_PAGE);
+                // INSERT GOODBYE PAGE SCENE AND THEN RETURN TO WELCOME PAGE
                 break;
 
         }
@@ -307,7 +314,7 @@ public class UIModel {
     // - Reads the amount from numberPadInput, validates it, and updates messages/results accordingly
     // - Otherwise, reset the ATM and display an error message
     public void processDeposit() {
-        if (state.equals(STATE_LOGGED_IN)) {
+        if (state.equals(STATE_DEPOSIT_PAGE)) {
             int amount = parseValidAmount(numberPadInput);
             if (amount > 0) {
                 bank.deposit( amount );
