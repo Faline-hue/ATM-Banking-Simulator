@@ -11,6 +11,15 @@ Features of the ATM:
    - Alerts user if they cannot withdraw any more today
  - Current date is read into program for multiple checks
 
+ - Deposit has a daily limit in place
+
+ -  - Navigation Pages and Flow
+   - Add a welcome page before logging in
+   - Add a goodbye page after logging out
+     - Loop back to log-in screen, skipping the welcome page
+   - Improve navigation between states/pages
+   - Ensure the user always knows what to do next
+
 
 This Branch:
 -
@@ -30,7 +39,6 @@ Additions to make:
  - 
  - Limit on cash deposit
    - Legal requirement to limit fraud
-   - Daily limit
    - Annual (Rolling 12 months) limit
  -
  - Change Password feature
@@ -46,12 +54,7 @@ Additions to make:
    - Initialise balance and account type
    - Switch to arraylist for storing bank accounts so there is no limit on bank accounts
  -
- - Navigation Pages and Flow
-   - Add a welcome page before logging in
-   - Add a goodbye page after logging out
-     - Loop back to log-in screen, skipping the welcome page
-   - Improve navigation between states/pages
-   - Ensure the user always knows what to do next
+
  - 
  - Login Control
    - Limit login attempts to 3 tries before locking account
