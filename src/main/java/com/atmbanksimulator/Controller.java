@@ -23,17 +23,22 @@ public class Controller {
             case "Ent":
                 UIModel.processEnter();
                 break;
-            case "W/D":
-                UIModel.processWithdraw();
-                break;
-            case "Dep":
-                UIModel.processDeposit();
-                break;
-            case "Bal":
-                UIModel.processBalance();
-                break;
-            case "Fin":
+            case "Sign-Out":
                 UIModel.processFinish();
+                break;
+            case "Withdraw", "Deposit", "Balance", "Change Password":
+                UIModel.stageManager(action);
+                break;
+            case "£10" : case "£20" : case "£50" : case "£75" : case "£100" :
+            case "£200" : case "£500":
+                UIModel.processWithdraw(action);
+                break;
+            case "Custom":
+                System.out.println("Custom call");
+                UIModel.processUnknownKey(action);
+                break;
+            case "Return to menu":
+                UIModel.stageManager(action);
                 break;
             default:
                 UIModel.processUnknownKey(action);
@@ -41,6 +46,23 @@ public class Controller {
         }
     }
 
+
+    void mouseClick( String action) {
+        switch (action) {
+            case "acc":
+                UIModel.processClick("acc");
+                break;
+            case "pass":
+                UIModel.processClick("pass");
+                break;
+            case "curpass":
+                UIModel.processClick("curpass");
+                break;
+            case "newpass":
+                UIModel.processClick("newpass");
+                break;
+        }
+    }
 }
 
 

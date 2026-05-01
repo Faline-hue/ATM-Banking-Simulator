@@ -2,48 +2,41 @@ package com.atmbanksimulator;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 
 // Follows the MVC model - Model View Controller
 
 public class Main extends Application {
     public static void main( String args[] ) {launch(args);}
 
+
     public void start(Stage window) {
+        // Make a stage variable
+        View.getWindow(window);
+
         // Creates a Bank
         Bank bank = new Bank();
 
+        // Creates an ObjectMapper
+        // Used to read/write JSON files
+        ObjectMapper objectMapper = new ObjectMapper();
+
         // Getting the file
-        File f = new File("F:\\bank.ser");
+        File f = new File("bank.ser");
 
+        // Reads the file only if it exists
         if (f.exists()){
-            // Deserializing to local file
-            try (FileInputStream fileIn = new FileInputStream("bank.ser");
-                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
-
-                bank = (Bank) in.readObject();
-                System.out.println("Bank object deserialized successfully.");
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            } catch (ClassNotFoundException c) {
-                System.out.println("Bank class not found.");
-                c.printStackTrace();
-                return;
-            }
+            bank.accounts.addAll(bank.load());
         } else {
-            // Used to assign the initial accounts before saving to serialised file
+            // Used to assign the initial accounts before saving to JSON file
             bank.addBankAccount("10001", "11111", 100, "Basic");
             bank.addBankAccount("10002", "22222", 50, "Basic");
             bank.addBankAccount("10003", "33333", 300, "Student" );
+            System.out.println("didn't read file");
         }
-
-
-
+        System.out.println(bank.accounts);
         // UIModel-View-Controller structure setup
         // Create the UIModel, View and Controller objects and link them together
         UIModel UIModel = new UIModel(bank);   // the UIModel needs the Bank object to 'talk to' the bank
