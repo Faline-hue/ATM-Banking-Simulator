@@ -3,6 +3,7 @@ package com.atmbanksimulator;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -16,7 +17,7 @@ import java.time.*;
 
 class View {
     int H = 700;         // Height of window pixels
-    int W = 900;         // Width  of window pixels
+    int W = 800;         // Width  of window pixels
 
     Controller controller; // Reference to the Controller (part of the MVC setup)
 
@@ -44,15 +45,25 @@ class View {
 
     private Pane screenArea;    // To put the changeable screens in later
 
+    // full list of screens:
     private GridPane welcomeScreen;
-    private GridPane signInScreen;
-    // etc
+    /*
+    signInScreen
+    createAccountScreen
+    mainMenuScreen
+    withdrawScreen
+    depositScreen
+    viewInfoScreen (balance)
+    changePasswordScreen
+    goodbyeScreen
+    */
 
     // start() is called from Main to set up the UI.
     // Important: Controls are created here so everything is initialised in the correct order
     public void start(Stage window) {
-
+        // make all screens needed:
         welcomeScreen = welcomeScreen();
+
         machineLayout(window);
         setScreen(welcomeScreen);
 
@@ -150,8 +161,12 @@ class View {
                 if ( !text.isEmpty() ) {
                     // non-empty string - make a button
                     Button btn = new Button( text );
+
                     btn.setOnAction( this::buttonClicked );
                     // Register event handler: call buttonClicked() whenever this button is pressed
+                    btn.setOnAction( this::pinPadClicked );
+                    // register event handler: call pinPadClicked() whenever this button is pressed
+
                     buttonPane.getChildren().add( btn );    // add this button to tiled pane
                 } else {
                     // empty string - make an empty Text element as a spacer
@@ -179,13 +194,24 @@ class View {
         }
     }
 
+    // method specifically for buttons clicked in the pin pad
+    private void pinPadClicked(ActionEvent event){
+        Button b = ((Button) event.getSource());
+        String text = b.getText();  // get the button label; might change to ids later
+        // but for now keeping as close a copy of buttonClicked as possible
+        System.out.println("View::pinPadButtonClicked: label = "+ text);
+        controller.processPinPad(text); // pass it to pin pad-specific controller process method
+    }
+
     // this method creates the main layout of the atm that doesn't change later
-    public void machineLayout(Stage window){
+    private void machineLayout(Stage window){
         // create the number pad (same one used throughout), an empty pane for the screen, and a gridpane to hold them both in the scene
         buttonPane = pinPad();
         screenArea = new Pane();
         //screenArea.setStyle("-fx-background-color: black;");
-        screenArea.setPrefSize(800,400);
+        screenArea.setPrefSize(600,400);
+        screenArea.setMinSize(600,400);
+        screenArea.setMaxSize(600,400);
 
         grid = new GridPane();
         grid.setId("machine");
@@ -208,14 +234,40 @@ class View {
 
     private GridPane welcomeScreen(){
         GridPane gp = new GridPane();
+
+        // make sure it's always the same size as the screen area
+        gp.setPrefSize(600,400);
+        gp.setMinSize(600,400);
+        gp.setMaxSize(600,400);
+
+        // idrk how to do this bit. this setup only works for this screen
+        gp.setPadding(new Insets(100,100,100,100));
+        gp.setHgap(50);
+        gp.setVgap(0);
+        gp.setAlignment(Pos.CENTER);
         gp.setGridLinesVisible(true);
-        gp.add(new Label("welcome screen"), 0, 0);
+
+        Label welcomeTitle = new Label("Welcome");
+
+        gp.getChildren().addAll(welcomeTitle);
 
         return gp;
     }
 
     private void setScreen(GridPane gp){
-        screenArea.getChildren().addAll(gp);
+        boolean found = false;
+        for (Node n : screenArea.getChildren()){
+            if (n == gp){
+                found = true;
+                n.setVisible(true);
+            }
+            else {
+                n.setVisible(false);
+            }
+        }
+        if (!found){
+            screenArea.getChildren().add(gp);
+        }
     }
 
     // This method is called when the user passes the welcome page.

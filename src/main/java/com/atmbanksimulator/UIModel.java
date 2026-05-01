@@ -36,7 +36,31 @@ public class UIModel {
     private final String STATE_DEPOSIT_PAGE = "Deposit";    // 5. Waiting for user to enter amount to deposit
     private final String STATE_BALANCE_PAGE = "Balance";    // 6. Showing balance of currently logged in account
     private final String STATE_CHANGE_PASS = "Change_Pass"; // 7. Sign-In page, allows user to change password
-    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 7. Sign-In page, allows user to change password
+    private final String STATE_GOODBYE_PAGE = "Goodbye"; // 7. Sign-In page, allows user to change password
+
+    // possible way of showing states:
+    /*
+    private boolean loggedIn;
+    private boolean doingProcess;
+    private String currentProcess;
+
+    state = [loggedIn, doingProcess]
+
+    [false, false] = welcome screen
+    v^
+    [false, true] = login attempt/creating account/goodbye screen
+    v^
+    [true, false] = main menu screen
+    v^
+    [true, true] = withdraw/deposit/view account screen/change password
+
+    technically only 4 states, with the process happening (if one is happening) stored as its own thing
+    can ONLY change in that order; a process must end and the state must return to [x, false] before a new process can begin
+    !! stays logged in for all processes that don't specifically log the user out
+    makes things much simpler further out, but a lot of changes in the immediate vicinity of the states
+
+     */
+
 
 
     // Variables representing the state and data of the ATM UIModel

@@ -15,13 +15,13 @@ public class Controller {
         switch (action) {
             case "1" : case "2" : case "3" : case "4" : case "5" :
             case "6" : case "7" : case "8" : case "9" : case "0" :
-                UIModel.processNumber(action);
+                // UIModel.processNumber(action);
                 break;
             case "CLR":
-                UIModel.processClear();
+                // UIModel.processClear();
                 break;
             case "Ent":
-                UIModel.processEnter();
+                // UIModel.processEnter();
                 break;
             case "Dep":
                 UIModel.processDeposit();
@@ -64,6 +64,32 @@ public class Controller {
         }
     }
 
+    void processPinPad(String action){
+        // input given via the pin pad should be handled separately to input given via the screen
+        switch (action) {
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+            case "8":
+            case "9":
+            case "0":
+                UIModel.processNumber(action);
+                break;
+            case "CLR":
+                UIModel.processClear();
+                break;
+            case "Ent":
+                UIModel.processEnter();
+                break;
+            default:
+                System.out.println("Controller::processPinPad action: "+action+" -- error: unknown key");
+                UIModel.processUnknownKey(action);
+        }
+    }
 
     void mouseClick( String action) {
         switch (action) {
