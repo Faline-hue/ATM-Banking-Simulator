@@ -13,21 +13,16 @@ package com.atmbanksimulator;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.*;
-import java.util.Objects;
 
 public class UIModel {
     View view; // Reference to the View (part of the MVC setup)
     private Bank bank; // The ATM communicates with this Bank
 
-    // The ATM UIModel can be in one of three states:
+    // The ATM UIModel can be in one of eight states:
     // We represent each state with a String constant.
     // The 'final' keyword ensures these values cannot be changed.
-    private final String STATE_ACCOUNT_NO = "account_no"; // 1. Waiting for an account number
-    private final String STATE_PASSWORD = "password";     // 2. Waiting for a password
-    private final String STATE_LOGGED_IN = "logged_in";   // 3. Logged in (ready to process requests)
 
     // New states:
-    // The ATM UIModel can be in one of these states:
     private final String STATE_WELCOME_PAGE = "welcome";    // 1. Default page upon start up, returns here after goodbye page
     private final String STATE_SIGNIN_PAGE = "Sign_In";     // 2. Sign-In page, waiting for account number and password
     private final String STATE_MAINMENU_PAGE = "Main_Menu"; // 3. Logged in (awaiting choice)
@@ -35,7 +30,7 @@ public class UIModel {
     private final String STATE_DEPOSIT_PAGE = "Deposit";    // 5. Waiting for user to enter amount to deposit
     private final String STATE_BALANCE_PAGE = "Balance";    // 6. Showing balance of currently logged in account
     private final String STATE_CHANGE_PASS = "Change_Pass"; // 7. Sign-In page, allows user to change password
-    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 7. Sign-In page, allows user to change password
+    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 8. Goodbye page, says goodbye to user, loops back to welcome page
 
 
     // Variables representing the state and data of the ATM UIModel
@@ -236,6 +231,7 @@ public class UIModel {
         }
     }
 
+    /*
     // Handle the Balance button:
     // - If the user is logged in, retrieve the current balance and update messages/results accordingly
     // - Otherwise, reset the ATM and display an error message
@@ -249,6 +245,7 @@ public class UIModel {
         }
         update();
     }
+    */
 
     // Handle the Withdraw button:
     // - If the user is logged in, attempt to withdraw the amount entered;
@@ -275,14 +272,14 @@ public class UIModel {
                         message = "Withdraw Failed";
                         result = "Insufficient Funds";
                     } else {
-                        if (bank.getDailyCap() == bank.getWithdrawalLimit()) {
+                        if (bank.getDailyCapWD() == bank.getWithdrawalLimit()) {
                             // Daily withdraw limit is reached
                             message = "Withdraw Failed";
                             result = "You've reached your withdraw limit for the day";
-                        } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCap())) {
+                        } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCapWD())) {
                             // Not enough left on user's withdraw limit
                             message = "Withdraw Failed";
-                            result = "You can only withdraw " + bank.getLimit() + " more today";
+                            result = "You can only withdraw " + bank.getWDLimit() + " more today";
                         } else {
                             // Fallback statement
                             message = "Withdraw Failed";
@@ -317,17 +314,47 @@ public class UIModel {
         if (state.equals(STATE_DEPOSIT_PAGE)) {
             int amount = parseValidAmount(numberPadInput);
             if (amount > 0) {
-                bank.deposit( amount );
-                message = "Deposit Successful";
-                result = "Deposited: " + numberPadInput;
-            }
-            else {
+                if (bank.deposit(amount)) {
+                    // If balance allows, will return true
+                    message = "Deposit Successful";
+                    result = "Deposited: " + amount;
+                } else if (!bank.deposit(amount)) {
+                    // If balance doesn't allow, will return false
+                    if (bank.getYearlyLimit() == bank.getYearlyCapD()) {
+                        // Reached yearly limit
+                        message = "Deposit Failed";
+                        result = "You have reached your deposit limit for the year \nYour deposit limit will reset on " + bank.getResetDate();
+                    } else if (amount > (bank.getYearlyLimit() - bank.getYearlyCapD())) {
+                        // Not enough left on user's yearly limit
+                        message = "Deposit Failed";
+                        result = "You can only deposit " + (bank.getYearlyLimit() - bank.getYearlyCapD()) + " more this year";
+                    }else {
+                        if (bank.getDailyCapD() == bank.getDlyDepositLimit()) {
+                            // Daily deposit limit is reached
+                            message = "Deposit Failed";
+                            result = "You've reached your deposit limit for the day";
+                        } else if (amount > (bank.getDlyDepositLimit() - bank.getDailyCapD())) {
+                            // Not enough left on user's deposit limit
+                            message = "Deposit Failed";
+                            result = "You can only deposit " + bank.getDepLimit() + " more today";
+                        } else {
+                            // Fallback statement
+                            message = "Deposit Failed";
+                            result = "";
+                        }
+                    }
+                } else {
+                    // Fallback statement
+                    message = "Deposit Failed";
+                    result = "";
+                }
+            } else {
+                // Fallback in event of error
                 message = "Invalid Amount";
-                result = "Now enter the amount\nThen press transaction\n(Dep = Deposit, W/D = Withdraw)";
+                result = "An error has occured \nPlease reenter how much you want to deposit";
             }
             numberPadInput = "";
-        }
-        else {
+        } else{
             reset("You are not logged in");
         }
         save(); //- Will save data to a serialized file for loading
