@@ -4,6 +4,7 @@ package com.atmbanksimulator;
 
 
 import java.io.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +72,7 @@ public class Bank implements Serializable {
             if (b.checkAccountNumber(accountNumber) && b.checkPassword(password)) {
                 // found the right account
                 loggedInAccount = b;
-                loggedInAccount.accessDate();
+                loggedInAccount.accessDate();   // Update the accounts limits
                 return true;
             }
         }
@@ -98,8 +99,7 @@ public class Bank implements Serializable {
     public boolean deposit(int amount)
     {
         if (loggedIn()) {
-            loggedInAccount.deposit(amount);
-            return true;
+            return loggedInAccount.deposit(amount);
         } else {
             return false;
         }
@@ -111,11 +111,7 @@ public class Bank implements Serializable {
     public boolean withdraw(int amount)
     {
         if (loggedIn()) {
-            if(loggedInAccount.withdraw(amount)){
-                return true;
-            } else {
-                return false;
-            }
+            return loggedInAccount.withdraw(amount);
         } else {
             return false;
         }
@@ -133,7 +129,7 @@ public class Bank implements Serializable {
     }
     // Get the currently logged-in account's withdrawn money today
     // by calling the getDailyCap method of the BankAccount object
-    public int getDailyCap()
+    public int getDailyCapWD()
     {
         if (loggedIn()) {
             return loggedInAccount.getDailyCap();
@@ -151,13 +147,78 @@ public class Bank implements Serializable {
             return -1; // Use -1 as an indicator of an error
         }
     }
+
     // Get the remaining possible balance that can be withdrawn today from the currently logged-in account
     // by calling the getWithdrawalLimit and getDailyCap methods
-    public int getLimit(){
+    public int getWDLimit(){
         if (loggedIn()) {
-            return (getWithdrawalLimit() - getDailyCap());
+            return (getWithdrawalLimit() - getDailyCapWD());
         } else {
             return 0;  // If error occurs, tell user that there is nothing left to take today
+        }
+    }
+
+    // Get the currently logged-in account's deposited money today
+    // by calling the getDailyCapD method of the BankAccount object
+    public int getDailyCapD()
+    {
+        if (loggedIn()) {
+            return loggedInAccount.getDailyCapD();
+        } else {
+            return -1; // Use -1 as an indicator of an error
+        }
+    }
+
+    // Get the currently logged-in account's daily deposit limit
+    // by calling the getDepositLimit method of the BankAccount object
+    public int getDlyDepositLimit()
+    {
+        if (loggedIn()) {
+            return loggedInAccount.getDepositLimit();
+        } else {
+            return -1; // Use -1 as an indicator of an error
+        }
+    }
+
+    // Get the remaining possible balance that can be deposited today from the currently logged-in account
+    // by calling the getDepositLimit and getDailyCapD methods
+    public int getDepLimit(){
+        if (loggedIn()) {
+            return (getDlyDepositLimit() - getDailyCapD());
+        } else {
+            return 0;  // If error occurs, tell user that there is nothing left to take today
+        }
+    }
+
+    // Get the currently logged-in account's deposited money this year
+    // by calling the getYearlyCap method of the BankAccount object
+    public int getYearlyCapD()
+    {
+        if (loggedIn()) {
+                return loggedInAccount.getYearlyCap();
+        } else {
+            return -1; // Use -1 as an indicator of an error
+        }
+    }
+
+    // Get the currently logged-in account's yearly deposit limit
+    // by calling the getYearlyLimit method of the BankAccount object
+    public int getYearlyLimit()
+    {
+        if (loggedIn()) {
+            return loggedInAccount.getYearlyLimit();
+        } else {
+            return -1; // Use -1 as an indicator of an error
+        }
+    }
+
+    // Get the currently logged-in account's next yearly reset date
+    public String getResetDate()
+    {
+        if (loggedIn()) {
+            return loggedInAccount.firstOfJanuary().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        } else {
+            return "";
         }
     }
 
