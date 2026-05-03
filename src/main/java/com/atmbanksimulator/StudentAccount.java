@@ -2,8 +2,11 @@ package com.atmbanksimulator;
 
 import java.time.LocalDate;
 
+// StudentAccount Class:
+// - Subclass of BankAccount used to hold the information for Student Accounts
+// - Inherits the methods from parent class
 public class StudentAccount extends BankAccount {
-    // Subclass of BankAccount used to hold the information for Student Accounts
+
 
     public StudentAccount() {}              // Constructor
     public StudentAccount(String a, String p, int b) {
@@ -21,9 +24,13 @@ public class StudentAccount extends BankAccount {
     public boolean withdraw( int amount ) {
         return super.withdraw(amount);
     }
+
     // Uses method from superclass to deposit cash into accounts balance
     // Updates the daily deposit cap so user cannot deposit more than their cap allows
     public boolean deposit( int amount ) { return super.deposit(amount);}
+
+    // Uses method from superclass to compare last accessed date to current date
+    // Utilised in daily deposit and withdrawal checks
     public boolean accessDate() { return super.accessDate();}
 
 }
