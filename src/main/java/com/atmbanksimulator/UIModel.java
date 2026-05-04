@@ -362,6 +362,19 @@ public class UIModel {
         update();
     }
 
+    public void processChangePass() {
+        if (state.equals(STATE_CHANGE_PASS)) {
+            // the problem with this version is it can only ever read one input per screen at a time, and the change password screen has two inputs
+            // so it's hallucinating an input from somewhere
+        }
+        else {
+            reset("You are not logged in");
+        }
+        save();
+        saveRead();
+        update();
+    }
+
     // Handle the Finish button:
     // - If the user is logged in, log out
     // - Otherwise, reset the ATM and display an error message
@@ -393,6 +406,7 @@ public class UIModel {
                 accNumber = numberPadInput;
                 break;
             case "curpass":
+                // this doesn't do anything i don't know where this is from
                 curPasswd = numberPadInput;
                 break;
             case "newpass":
