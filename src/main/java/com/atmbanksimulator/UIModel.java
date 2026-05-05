@@ -12,6 +12,7 @@ package com.atmbanksimulator;
 
 import tools.jackson.databind.ObjectMapper;
 
+
 import java.io.*;
 
 public class UIModel {
@@ -27,11 +28,10 @@ public class UIModel {
     private final String STATE_SIGNIN_PAGE = "Sign_In";     // 2. Sign-In page, waiting for account number and password
     private final String STATE_MAINMENU_PAGE = "Main_Menu"; // 3. Logged in (awaiting choice)
     private final String STATE_WITHDRAW_PAGE = "Withdraw";  // 4. Waiting for user to select amount to withdraw
-    private final String STATE_WITHDRAW_CUSTOM = "Withdraw_Custom"; // 5. Waiting for user to enter amount to withdraw
-    private final String STATE_DEPOSIT_PAGE = "Deposit";    // 6. Waiting for user to enter amount to deposit
-    private final String STATE_BALANCE_PAGE = "Balance";    // 7. Showing balance of currently logged in account
-    private final String STATE_CHANGE_PASS = "Change_Pass"; // 8. Sign-In page, allows user to change password
-    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 9. Goodbye page, says goodbye to user, loops back to welcome page
+    private final String STATE_DEPOSIT_PAGE = "Deposit";    // 5. Waiting for user to enter amount to deposit
+    private final String STATE_BALANCE_PAGE = "Balance";    // 6. Showing balance of currently logged in account
+    private final String STATE_CHANGE_PASS = "Change_Pass"; // 7. Sign-In page, allows user to change password
+    private final String STATE_GOODBYE_PAGE = "Goodbye"; // 8. Goodbye page, says goodbye to user, loops back to welcome page
 
 
     // Variables representing the state and data of the ATM UIModel
@@ -52,14 +52,17 @@ public class UIModel {
     }
 
     // Initialise the ATM UIModel: this method is called by Main when starting the app
-    // - Set state to STATE_ACCOUNT_NO
+    // - Set state to STATE_WELCOME_PAGE
     // - Clear the numberPadInput - numbers displayed in the TextField
     // - Display the welcome message and user instructions
     public void initialise() {
-        setState(STATE_SIGNIN_PAGE);
+        setState(STATE_WELCOME_PAGE);
+        view.welcomePage(View.stage);
         numberPadInput = "";
-        message = "Sign-In";
-        result = "Enter your Account Number and Password";
+        message = "Welcome to Emalka Banking";
+        result = "         Free cash Withdrawals, Balance enquires \n                                   and Deposits.\n \n" +
+                "                         Press Enter to continue";
+
         update();
     }
 
@@ -72,7 +75,7 @@ public class UIModel {
         view.signInPage(View.stage);
         numberPadInput = "";
         message = "Sign-In";
-        result = "An error has occured, \n please Sign-in again";
+        result = "An error has occured, please Sign-in again";
     }
 
     // Change the ATM state and print a debug message whenever the state changes
@@ -112,12 +115,27 @@ public class UIModel {
         // The action depends on the current ATM state
         switch ( state )
         {
+            case STATE_WELCOME_PAGE:
+                // Welcomes the User
+                // Tells the User what services are provided
+
+                numberPadInput = "";
+                if (numberPadInput.equals(""))
+                {
+                    // Bring user to Sign in page
+                    setState(STATE_SIGNIN_PAGE);
+                    hideScene();
+                    view.signInPage(View.stage);
+                    message = "Sign-In";
+                    result = "  Please enter your Account number and Password";
+
+                }
+                break;
             case STATE_SIGNIN_PAGE:
                     // Waiting for user's account details
                     // Will attempt to log in with given details
                 accPasswd = numberPadInput;
                 numberPadInput = "";
-                // if ( bank.ch)
                 if ( bank.login(accNumber, accPasswd) )
                 {
                     // Successful login: change state to STATE_MAINMENU_PAGE and provide instructions
@@ -153,20 +171,28 @@ public class UIModel {
                     result = "Password incorrect\nPlease ensure current password is correct";
                 }
                 break;
+
+            case STATE_GOODBYE_PAGE:
+                if (numberPadInput.equals(""))
+                {
+                    // Bring user back to the welcome page
+                    setState(STATE_WELCOME_PAGE);
+                    hideScene();
+                    view.welcomePage(View.stage);
+                    message = "Welcome to Emalka Banking";
+                    result = "         Free cash Withdrawals, Balance enquires \n                                   and Deposits.\n \n" +
+                            "                         Press Enter to continue";
+
+                }
+                break;
+
             case STATE_DEPOSIT_PAGE:
                     // Waiting for user's deposit
-                    // Will confirm daily and yearly deposit limit
+                    // Will confirm daily deposit limit
                 processDeposit();
-                break;
-            case STATE_WITHDRAW_CUSTOM:
-                    // Waiting for user's withdrawal
-                    // Will confirm daily withdrawal limit
-                processWithdraw("Custom");
-                break;
 
             default:
                 // Do nothing for other states (user is already logged in)
-                break;
         }
 
         update(); // Refresh the GUI to show messages and input
@@ -197,14 +223,14 @@ public class UIModel {
                 hideScene();
                 view.balance(View.stage);
                 message = "Your account balance is:";
-                result = Integer.toString(bank.getBalance());
+                result = "£" + Integer.toString(bank.getBalance());
                 break;
             case "Change Password":
                 setState(STATE_CHANGE_PASS);
                 hideScene();
                 view.chngPass(View.stage);
                 message = "Changing Password";
-                result = "Please enter your current password\nand your new password";
+                result = "Please enter your current password and your\n new password";
                 break;
             case "Return to menu":
                 setState(STATE_MAINMENU_PAGE);
@@ -213,17 +239,18 @@ public class UIModel {
                 message = "Main Menu";
                 result = "Please select the option you would like to access";
                 break;
-            case "Custom":
-                setState(STATE_WITHDRAW_CUSTOM);
-                hideScene();
-                view.withdrawsCustom(View.stage);
-                message = "Enter amount to withdraw";
-                result = "Please enter the amount you want to withdraw";
-                break;
             case "Sign-Out":
+                //goodbye page, Logs the user out
                 setState(STATE_GOODBYE_PAGE);
-                // INSERT GOODBYE PAGE SCENE AND THEN RETURN TO WELCOME PAGE
+                bank.logout();
+                hideScene();
+                view.welcomePage(View.stage);
+                message = "Sign-Out";
+                result = "    Thankyou for Banking with Emalka! \n \n" +
+                        "          Press Enter to continue";
+
                 break;
+
 
         }
         update();
@@ -247,6 +274,22 @@ public class UIModel {
         }
     }
 
+    /*
+    // Handle the Balance button:
+    // - If the user is logged in, retrieve the current balance and update messages/results accordingly
+    // - Otherwise, reset the ATM and display an error message
+    public void processBalance() {
+        if (state.equals(STATE_LOGGED_IN) ) {
+            numberPadInput = "";
+            message = "Balance Available";
+            result = "Your Balance is: " + bank.getBalance();
+        } else {
+            reset("You are not logged in");
+        }
+        update();
+    }
+    */
+
     // Handle the Withdraw button:
     // - If the user is logged in, attempt to withdraw the amount entered;
     //  - If the user has exceeded their withdrawal limit for the day it will fail and notify them
@@ -254,19 +297,17 @@ public class UIModel {
     // - otherwise, reset the ATM and display an error message.
     // - Reads the amount from numberPadInput, validates it, and updates messages/results accordingly.
     public void processWithdraw(String action) {
-        if (state.equals(STATE_WITHDRAW_PAGE) || state.equals(STATE_WITHDRAW_CUSTOM)) {
+        if (state.equals(STATE_WITHDRAW_PAGE)) {
             int amount = 0;
             if (action != "Custom") {
                 System.out.println(action);
                 amount = Integer.parseInt(action.replace("£", ""));
-            } else if (action == "Custom") {
-                amount = parseValidAmount(numberPadInput);
             }
             if (amount > 0) {
                 if (bank.withdraw(amount)) {
                     // If balance allows, will return true
                     message = "Withdraw Successful";
-                    result = "Withdrawn: " + amount;
+                    result = "Withdrawn: £" + amount;
                 } else if (!bank.withdraw(amount)) {
                     // If balance doesn't allow, will return false
                     if (amount > bank.getBalance() ){
@@ -277,7 +318,7 @@ public class UIModel {
                         if (bank.getDailyCapWD() == bank.getWithdrawalLimit()) {
                             // Daily withdraw limit is reached
                             message = "Withdraw Failed";
-                            result = "You've reached your withdrawal limit for the day";
+                            result = "You've reached your withdraw limit for the day";
                         } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCapWD())) {
                             // Not enough left on user's withdraw limit
                             message = "Withdraw Failed";
@@ -319,7 +360,7 @@ public class UIModel {
                 if (bank.deposit(amount)) {
                     // If balance allows, will return true
                     message = "Deposit Successful";
-                    result = "Deposited: " + amount;
+                    result = "Deposited: £" + amount;
                 } else if (!bank.deposit(amount)) {
                     // If balance doesn't allow, will return false
                     if (bank.getYearlyLimit() == bank.getYearlyCapD()) {
@@ -369,9 +410,9 @@ public class UIModel {
     // - Otherwise, reset the ATM and display an error message
     public void processFinish() {
         if (state.equals(STATE_MAINMENU_PAGE) ) {
-            reset("Thank you for using the Bank ATM");
             bank.logout();
-            view.signInPage(View.stage);
+            setState(STATE_GOODBYE_PAGE);
+
         } else {
             reset("You are not logged in");
         }

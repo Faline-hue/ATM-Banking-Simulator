@@ -8,7 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
-import java.time.*;
+import javafx.geometry.*;
+
 
 // The View class creates the GUI for the application.
 // It does not know anything about business logic;
@@ -23,6 +24,7 @@ class View {
     public static Stage getWindow(Stage window) {
 
         return stage = window;
+
     }
     public static Stage stage;
 
@@ -56,6 +58,12 @@ class View {
         buttonPane.setPrefColumns(3);
         buttonPane.setPrefRows(4);
         buttonPane.setMaxWidth(250);
+        GridPane.setHalignment(buttonPane, HPos.CENTER); // Centers the Pinpad
+
+
+
+
+
         // Define the button layout as a 2D array of text labels.
         // Empty strings ("") represent blank spaces in the grid.
         String buttonTexts[][] = {
@@ -74,7 +82,7 @@ class View {
                 if ( !text.isEmpty() ) {
                     // non-empty string - make a button
                     Button btn = new Button( text );
-                    btn.setOnAction( this::pinPadClicked );
+                    btn.setOnAction( this::buttonClicked );
                     // Register event handler: call buttonClicked() whenever this button is pressed
                     buttonPane.getChildren().add( btn );    // add this button to tiled pane
                 } else {
@@ -90,7 +98,7 @@ class View {
     // This is how the View talks to the Controller
     // This method is called when a button is pressed
     // It fetches the label on the button and passes it to the controller's process method
-    private void buttonClicked(ActionEvent event) {
+    public void buttonClicked(ActionEvent event) {
         // This line asks the event to provide the actual Button object that was clicked
         Button b = ((Button) event.getSource());
         String text = b.getText();   // get the button label
@@ -98,18 +106,59 @@ class View {
         controller.process( text );  // Pass it to the controller's process method
     }
 
-    // This is how the View talks to the Controller
-    // This method is called when the pin pad is pressed
-    // It fetches the label on the button and passes it to the controller's process method
-    private void pinPadClicked(ActionEvent event) {
-        // This line asks the event to provide the actual Button object that was clicked
-        Button b = ((Button) event.getSource());
-        String text = b.getText();   // get the button label
-        System.out.println( "View::buttonClicked: label = "+ text );
-        controller.pinPad( text );  // Pass it to the controller's process method
+    //This method is called upon startup and after signing out
+    public void welcomePage(Stage window){
+        // Creates a Grid Pane
+        grid = new GridPane();  // Page Layout
+        grid.setId("layout");   // CSS ID
+
+        // Setting the padding
+        grid.setPadding(new Insets(25,25,25,25));
+
+        // Setting the vert and hori gaps between the columns
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        // Setting the grid alignment
+        grid.setAlignment(Pos.CENTER);
+
+
+        // Creates a label title
+        laMsg = new Label("Welcome");   // Title bar at the top
+        laMsg.setId("titleWelcome");   // CSS ID for designs
+        grid.add(laMsg, 0, 0);         // Add to GUI at the top
+        GridPane.setHalignment(laMsg, HPos.CENTER);
+
+        // Creates a Text Area for instructions
+        taResult = new TextArea("\"Welcome to Emalka Banking!\\nFree cash withdrawals, balance  enquires \\nand deposits.\\n\" +\n" +
+                "                            \"Press enter to continue\";");   // Instructions
+        taResult = new TextArea("Welcome");   // Instructions
+        taResult.setId("welcomeText"); // CSS ID for designs
+        taResult.setEditable(false);       // Read only
+        taResult.setPrefHeight(175);       // Assign dimensions to the field
+
+        //scrollPane  = new ScrollPane();    // create a scrolling window
+        //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
+        //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
+        grid.add( taResult, 0, 1);    // add the scrolling window to GUI on third row
+
+
+
+        // Create pin pad
+        buttonPane = pinPad();
+
+
+        grid.add(buttonPane,0,4); // add the tiled pane of buttons to the main grid
+
+        // add the complete GUI to the window and display it
+        Scene welcomePage = new Scene(grid, W, H);
+        welcomePage.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(welcomePage);
+        window.setTitle("ATM-Bank Simulator"); //set window title
+        window.setResizable(false);
+        window.show();
+
     }
-
-
 
     // This method is called when the user passes the welcome page.
     // Fills in the contents of the scene to create a sign-in page
@@ -132,14 +181,16 @@ class View {
 
         // Creates a label title
         laMsg = new Label("Sign-In");   // Title bar at the top
-        laMsg.setId("title");   // CSS ID for designs
+        laMsg.setId("titleSignIn");   // CSS ID for designs
         grid.add(laMsg, 0, 0);         // Add to GUI at the top
+
 
         // Creates a Text Area for instructions
         taResult = new TextArea("Please enter your account number and password");   // Instructions
-        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setId("SignInText"); // CSS ID for designs
         taResult.setEditable(false);       // Read only
-        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        taResult.setPrefHeight(75);       // Assign dimensions to the field
+
         //scrollPane  = new ScrollPane();    // create a scrolling window
         //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
         //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
@@ -174,9 +225,6 @@ class View {
         Scene signIn = new Scene(grid, W, H);
         signIn.getStylesheets().add("atm.css"); // tell to use our CSS file
         window.setScene(signIn);
-        window.setTitle("ATM-Bank Simulator"); //set window title
-        window.setResizable(false);
-        window.show();
     }
 
     // This method is called when the user logs in.
@@ -202,12 +250,13 @@ class View {
         laMsg = new Label("Main Menu");     // Title bar at the top
         laMsg.setId("title");                   // CSS ID for designs
         grid.add(laMsg, 0, 0);         // Add to GUI at the top
+        GridPane.setHalignment(laMsg, HPos.CENTER);
 
         // Creates a Text Area for instructions
         taResult = new TextArea("Please select the option you need");   // Instructions
-        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setId("menuText"); // CSS ID for designs
         taResult.setEditable(false);       // Read only
-        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        taResult.setPrefHeight(75);       // Assign dimensions to the field
         //scrollPane  = new ScrollPane();    // create a scrolling window
         //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
         //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
@@ -215,16 +264,16 @@ class View {
 
         // Create pin pad
         TilePane menuPane = new TilePane(); //
-        menuPane.setId("menu"); // CSS ID
+        menuPane.setId("menuButtons"); // CSS ID
         menuPane.setPrefColumns(2);
         menuPane.setPrefRows(4);
         menuPane.setMaxWidth(500);
+        GridPane.setHalignment(menuPane, HPos.CENTER);
         // Define the button layout as a 2D array of text labels.
         // Empty strings ("") represent blank spaces in the grid.
         String buttonTexts[][] = {
                 {"Withdraw",  "Deposit"},
                 {"Balance", "Change Password"},
-                {"", ""},
                 {"", "Sign-Out"} };
 
         // Build the button panel, loop through the array,
@@ -248,9 +297,8 @@ class View {
         }
         grid.add(menuPane,0,2); // Add the tiled pane of buttons to the main grid
 
-        // Create pin pad
-        buttonPane = pinPad();
-        grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
+
+
 
         // add the complete GUI to the window and display it
         Scene maMenu = new Scene(grid, W, H);
@@ -281,12 +329,13 @@ class View {
         laMsg = new Label("Select Amount to Withdraw");     // Title bar at the top
         laMsg.setId("title");                   // CSS ID for designs
         grid.add(laMsg, 0, 0);         // Add to GUI at the top
+        GridPane.setHalignment(laMsg, HPos.CENTER);
 
         // Creates a Text Area for instructions
         taResult = new TextArea("Please select the amount");   // Instructions
-        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setId("withdrawText"); // CSS ID for designs
         taResult.setEditable(false);       // Read only
-        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        taResult.setPrefHeight(75);       // Assign dimensions to the field
         //scrollPane  = new ScrollPane();    // create a scrolling window
         //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
         //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
@@ -294,11 +343,12 @@ class View {
 
         // Create withdrawal options
         TilePane menuPane = new TilePane(); //
-        menuPane.setId("menu"); // CSS ID
+        menuPane.setId("menuWithdraw"); // CSS ID
         menuPane.setPrefColumns(2);
         menuPane.setPrefRows(3);
         menuPane.setMaxWidth(500);
         menuPane.setHgap(60);
+        GridPane.setHalignment(menuPane, HPos.CENTER);
         // Define the button layout as a 2D array of text labels.
         // Empty strings ("") represent blank spaces in the grid.
         String withdrawButtons[][] = {
@@ -334,6 +384,8 @@ class View {
         goBack.setId("return");
         goBack.setOnAction( this::buttonClicked );
         grid.add(goBack, 0, 3 );
+        GridPane.setHalignment(goBack, HPos.CENTER);
+
 
         // Create pin pad
         buttonPane = pinPad();
@@ -365,12 +417,13 @@ class View {
         laMsg = new Label("Your account balance is:");     // Title bar at the top
         laMsg.setId("title");                   // CSS ID for designs
         grid.add(laMsg, 0, 0);         // Add to GUI at the top
+        GridPane.setHalignment(laMsg, HPos.CENTER);
 
         // Creates a Text Area for instructions
         //taResult = new TextArea();   // Instructions
-        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setId("balanceText"); // CSS ID for designs
         taResult.setEditable(false);       // Read only
-        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        taResult.setPrefHeight(75);       // Assign dimensions to the field
         //scrollPane  = new ScrollPane();    // create a scrolling window
         //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
         //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
@@ -381,7 +434,7 @@ class View {
         goBack.setId("return");
         goBack.setOnAction( this::buttonClicked );
         grid.add(goBack, 0, 2 );
-
+        GridPane.setHalignment(goBack, HPos.CENTER);
 
         // Create pin pad
         buttonPane = pinPad();
@@ -415,6 +468,7 @@ class View {
         laMsg = new Label("Change Password");   // Title bar at the top
         laMsg.setId("title");   // CSS ID for designs
         grid.add(laMsg, 0, 0);         // Add to GUI at the top
+        GridPane.setHalignment(laMsg, HPos.CENTER);
 
         // Creates a Text Area for instructions
         taResult = new TextArea("Please enter your current password\nand new password");   // Instructions
@@ -451,6 +505,7 @@ class View {
         goBack.setId("return");
         goBack.setOnAction( this::buttonClicked );
         grid.add(goBack, 0, 4 );
+        GridPane.setHalignment(goBack, HPos.CENTER);
 
         // Create pin pad
         buttonPane = pinPad();
@@ -485,12 +540,13 @@ class View {
         laMsg = new Label("Enter amount to deposit");     // Title bar at the top
         laMsg.setId("title");                   // CSS ID for designs
         grid.add(laMsg, 0, 0);         // Add to GUI at the top
+        GridPane.setHalignment(laMsg, HPos.CENTER);
 
         // Creates a Text Area for instructions
         taResult = new TextArea("Please enter the amount you wish to deposit");   // Instructions
-        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setId("depositText"); // CSS ID for designs
         taResult.setEditable(false);       // Read only
-        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        taResult.setPrefHeight(90);       // Assign dimensions to the field
         //scrollPane  = new ScrollPane();    // create a scrolling window
         //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
         //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
@@ -506,58 +562,7 @@ class View {
         goBack.setId("return");
         goBack.setOnAction( this::buttonClicked );
         grid.add(goBack, 0, 3 );
-
-
-        // Create pin pad
-        buttonPane = pinPad();
-        grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
-
-        // add the complete GUI to the window and display it
-        Scene deposit = new Scene(grid, W, H);
-        deposit.getStylesheets().add("atm.css"); // tell to use our CSS file
-        window.setScene(deposit);
-    }
-    // This method is called when the user selects Custom in the withdrawals page
-    // Fills in the contents of the scene to create a Withdrawals page
-    //
-    public void withdrawsCustom(Stage window){
-        // Creates a Grid Pane
-        grid = new GridPane();  // Page Layout
-        grid.setId("layout");   // CSS ID
-
-        // Setting the padding
-        grid.setPadding(new Insets(25,25,25,25));
-
-        // Setting the vert and hori gaps between the columns
-        grid.setVgap(10);
-        grid.setHgap(10);
-
-        // Setting the grid alignment
-        grid.setAlignment(Pos.CENTER);
-
-        // Creates a label title
-        laMsg = new Label();     // Title bar at the top
-        laMsg.setId("title");                   // CSS ID for designs
-        grid.add(laMsg, 0, 0);         // Add to GUI at the top
-
-        // Creates a Text Area for instructions
-        taResult = new TextArea();   // Instructions
-        taResult.setId("instructions"); // CSS ID for designs
-        taResult.setEditable(false);       // Read only
-        taResult.setPrefHeight(100);       // Assign dimensions to the field
-        grid.add( taResult, 0, 1);    // Add the scrolling window to GUI on third row
-
-        tfInput = new TextField();
-        tfInput.setId("withdrawField");
-        tfInput.setEditable(false);     // Read only
-        grid.add(tfInput, 0, 2);
-
-        // Creates a return to menu button
-        goBack = new Button("Return to menu");
-        goBack.setId("return");
-        goBack.setOnAction( this::buttonClicked );
-        grid.add(goBack, 0, 3 );
-
+        GridPane.setHalignment(goBack, HPos.CENTER);
 
         // Create pin pad
         buttonPane = pinPad();
@@ -581,6 +586,7 @@ class View {
     // - taResultMsg → shown in the text area (instructions / results)
     public void update(String msg,String tfInputMsg,String taResultMsg)
     {
+        GridPane.setHalignment(laMsg, HPos.CENTER);
         laMsg.setText(msg);
         if (tfSelect == "accountNum"){
             accNum.setText(tfInputMsg);     // Account number update

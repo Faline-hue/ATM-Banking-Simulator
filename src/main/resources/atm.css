@@ -3,28 +3,99 @@
     -fx-hgap: 5;
     -fx-vgap: 5;
     -fx-padding: 10;
-}
 
+
+}
+/* CSS for the pinpad */
 #Buttons {
     -fx-pref-columns: 6;
     -fx-pref-tile-width: 75;
     -fx-hgap: 5;
     -fx-vgap: 5;
-}
+    -fx-border-color: lightgray;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
 
+
+
+}
+/* CSS for the pane the Pinpad is on. */
 .button {
-    -fx-font: bold 16pt "courier new";
+    -fx-font: bold 16pt "Baskerville";
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-opacity: 90%;
+    -fx-border-color: #C0C0C0;
+    -fx-smooth: true;
 }
 
+#menuButtons {
+    -fx-hgap: 5;
+    -fx-vgap: 40;
+
+
+}
+#menuWithdraw {
+    -fx-vgap: 10;
+
+}
+/*  */
+titleWelcome {
+
+
+}
 .label {
-    -fx-font: bold 14pt "Courier New";  /* font size and weight */
-    -fx-text-fill: darkblue;            /* text color */
+    -fx-font: bold 30pt "Baskerville";  /* font size and weight */
+    -fx-text-fill: DarkGreen;            /* text color */
+
+}
+/* CSS for the Welcome page's text */
+#welcomeText {
+    -fx-font: bold 20pt "Helvetica";  /* font size and weight */
+    -fx-text-fill: black;               /* text color */
+
 }
 
+/* CSS for the Sign in page's text */
+#SignInText {
+    -fx-font: bold 21pt "Helvetica";  /* font size and weight */
+    -fx-text-fill: black;               /* text color */
+
+}
+
+/* CSS for the menu page's text */
+#menuText{
+    -fx-font: bold 21pt "Helvetica";  /* font size and weight */
+    -fx-text-fill: black;               /* text color */
+
+}
+
+/* CSS for the withdrawal page's text */
+#withdrawText {
+    -fx-font: bold 25pt "Helvetica";  /* font size and weight */
+    -fx-text-fill: black;               /* text color */
+
+}
+
+/* CSS for the deposit page's text */
+#depositText{
+    -fx-font: bold 21pt "Helvetica";  /* font size and weight */
+    -fx-text-fill: black;               /* text color */
+
+}
+
+/* CSS for the Balance page's text */
+#balanceText{
+    -fx-font: bold 30pt "Helvetica";  /* font size and weight */
+    -fx-text-fill: black;               /* text color */
+
+}
 .text-field {
-    -fx-font: bold 14pt "Courier New"; /* or any font size you want */
+    -fx-font: bold 16 "Helvetica"; /* or any font size you want */
 }
 
 .text-area {
-    -fx-font: bold 14pt "Courier New"; /* or any font size you want */
+    -fx-font: bold 21pt "Helvetica"; /* or any font size you want */
 }
+
