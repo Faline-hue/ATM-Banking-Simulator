@@ -43,8 +43,8 @@ public class UIModel {
     // Variables shown on the View display
     private String message;                // Message label text
     private String numberPadInput;         // Current number displayed in the TextField (as a string)
-    private String inputA;
-    private String inputB;                  // inputs for when there's two fields onscreen
+    private String inputA;                  // top input field -alice
+    private String inputB;                  // bottom input field, if present -alice
     private String result;                 // Contents of the TextArea (Could be multiple lines)
 
     // UIModel constructor: pass a Bank object that the ATM interacts with
@@ -58,7 +58,8 @@ public class UIModel {
     // - Display the welcome message and user instructions
     public void initialise() {
         setState(STATE_SIGNIN_PAGE);
-        numberPadInput = "";
+        inputA = "";
+        inputB = "";
         message = "Sign-In";
         result = "Enter your Account Number and Password";
         update();
@@ -71,7 +72,8 @@ public class UIModel {
     private void reset(String msg) {
         setState(STATE_SIGNIN_PAGE);
         view.signInPage(View.stage);
-        numberPadInput = "";
+        inputA = "";
+        inputB = "";
         message = "Sign-In";
         result = "An error has occured, \n please Sign-in again";
     }
@@ -93,42 +95,34 @@ public class UIModel {
     // Handle a number button press: append the digit to numberPadInput
     // needs to append to different input variable based on state -alice
     public void processNumber(String numberOnButton, String focusField) {
-        switch (state) {
-            case STATE_SIGNIN_PAGE:
-                if (focusField.equals("accountNum")) {
-                    accNumber += numberOnButton;
-                }
-                else if (focusField.equals("password")) {
-                    accPasswd += numberOnButton;
-                }
-                else {
-                    numberPadInput += numberOnButton;
-                }
-                break;
-            case STATE_CHANGE_PASS:
-                if (focusField.equals("current password")) {
-                    curPasswd += numberOnButton;
-                }
-                else if (focusField.equals("new password")) {
-                    newPasswd += numberOnButton;
-                }
-                else {
-                    numberPadInput += numberOnButton;
-                }
-                break;
-            default:
-                numberPadInput += numberOnButton;
+        if (focusField.equals("B")) {
+            if (state.equals(STATE_SIGNIN_PAGE) || state.equals(STATE_CHANGE_PASS)) {
+                inputB += numberOnButton;
+            }
         }
-        numberPadInput += numberOnButton;
+        else {
+            inputA += numberOnButton;
+        }
+
         update();
     }
 
     // Handle the Clear button: reset the current number stored in numberPadInput
-    public void processClear() {
-        if (!numberPadInput.isEmpty()) {
-            numberPadInput = "";
-            message = "Input Cleared";
-            update();
+    // clear the currently selected input field only -alice
+    public void processClear(String field) {
+        if (field.equals("A")) {
+            if (!inputA.isEmpty()) {
+                inputA = "";
+                message = "Input Cleared";
+                update();
+            }
+        }
+        else {
+            if (!inputB.isEmpty()) {
+                inputB = "";
+                message = "Input Cleared";
+                update();
+            }
         }
     }
 
@@ -143,9 +137,7 @@ public class UIModel {
             case STATE_SIGNIN_PAGE:
                     // Waiting for user's account details
                     // Will attempt to log in with given details
-                // accPasswd = numberPadInput; -alice
-                numberPadInput = "";
-                if ( bank.login(accNumber, accPasswd) )
+                if ( bank.login(inputA, inputB) )
                 {
                     // Successful login: change state to STATE_MAINMENU_PAGE and provide instructions
                     setState(STATE_MAINMENU_PAGE);
@@ -157,22 +149,22 @@ public class UIModel {
                 } else {
                     // Login failed: reset ATM and display error
                     message = "Login failed: Unknown Account/Password";
-                    System.out.println(accNumber + " " + accNumber);
+                    System.out.println(inputA + " " + inputB);
                     reset(message);
                 }
                 break;
             case STATE_CHANGE_PASS:
                     // Waiting for user's password details
                     // Will confirm password details
-                // newPasswd = numberPadInput; -alice
-                numberPadInput = "";
-                if (bank.checkPassword(curPasswd)){
+                curPasswd = inputA;
+                newPasswd = inputB;
+                if (bank.checkPassword(inputA)){
                     // Current password entered correctly
-                    bank.changePassword(curPasswd, newPasswd); // need to change to only check current password once -alice
+                    bank.changePassword(inputA, inputB); // need to change to only check current password once -alice
                     result = "Password successfully updated\nYou may now return to menu";
                     saveRead();
                     save();
-                } else if(curPasswd == newPasswd){
+                } else if(inputA == inputB){
                     // Password isn't new
                     result = "New password is identical to current password\nPlease enter a new password";
                 }else {
@@ -188,7 +180,8 @@ public class UIModel {
             default:
                 // Do nothing for other states (user is already logged in)
         }
-
+        inputA = "";
+        inputB = "";
         update(); // Refresh the GUI to show messages and input
     }
 
@@ -325,7 +318,8 @@ public class UIModel {
                 message = "Invalid Amount";
                 result = "An error has occured \nPlease reselect how much you want to withdraw";
             }
-            numberPadInput = "";
+            inputA = "";
+            inputB = "";
         }
         else {
             reset("You are not logged in");
@@ -341,7 +335,7 @@ public class UIModel {
     // - Otherwise, reset the ATM and display an error message
     public void processDeposit() {
         if (state.equals(STATE_DEPOSIT_PAGE)) {
-            int amount = parseValidAmount(numberPadInput);
+            int amount = parseValidAmount(inputA);
             if (amount > 0) {
                 if (bank.deposit(amount)) {
                     // If balance allows, will return true
@@ -382,7 +376,8 @@ public class UIModel {
                 message = "Invalid Amount";
                 result = "An error has occured \nPlease reenter how much you want to deposit";
             }
-            numberPadInput = "";
+            inputA = "";
+            inputB = "";
         } else{
             reset("You are not logged in");
         }
@@ -427,21 +422,14 @@ public class UIModel {
 
     // Handle clicking on text field during sign-in:
     public void processClick(String action){
-        /*switch (action){
-            case "acc":
-                accPasswd = numberPadInput;
+        switch (action){
+            /*case "acc": case "curpass":*/ case "A":
+                inputA = "";
                 break;
-            case "pass":
-                accNumber = numberPadInput;
+            /*case "pass": case "newpass":*/ case "B":
+                inputB = "";
                 break;
-            case "curpass":
-                curPasswd = numberPadInput;
-                break;
-            case "newpass":
-                newPasswd = numberPadInput;
-                break;
-        }*/
-        numberPadInput = "";
+        }
         update();
     }
     // i think this is causing a problem with the logging in and changing passwords -alice
@@ -449,7 +437,7 @@ public class UIModel {
 
     // Notify the View of changes by calling its update method
     private void update() {
-        view.update(message,numberPadInput, result);
+        view.update(message, inputA, inputB, result);
     }
 
     // Hide previous scene

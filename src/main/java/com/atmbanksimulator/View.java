@@ -31,11 +31,17 @@ class View {
 
     // Components (controls and layout) of the user interface
     private Label laMsg;        // Header at the top of the GUI
+
+    // these 4 all seem to be variations on the same thing: -alice
     private TextField tfInput;  // Input field where numbers typed on the keypad appear
     // is there a difference between tfSelect and tfInput? -alice
     private TextField accNum;   // Input field for account number
     private TextField paswrd;   // Input field for password
     private TextField newPaswrd;// Input field for password change
+
+    private TextField tfInputA;    // view doesn't crae what's being entered; top field for all screens -alice
+    private TextField tfInputB;    // bottom field for screens with 2 -alice
+
     private Button goBack;       // Send data
     private TextArea taResult;  // Output area where instructions and results are displayed
     private GridPane grid;      // Main layout container (grid-based)
@@ -137,23 +143,23 @@ class View {
         grid.add( taResult, 0, 1);    // add the scrolling window to GUI on third row
 
         // Creates a Text field for inputting account number
-        accNum = new TextField();     // text field for numbers
-        accNum.setEditable(false);     // Read only
-        grid.add(accNum, 0, 2);    // Add to GUI on second row
-        accNum.setOnMouseClicked(event -> {
-            tfSelect = "accountNum";
-            controller.mouseClick("acc");
+        tfInputA = new TextField();     // text field for numbers
+        tfInputA.setEditable(false);     // Read only
+        grid.add(tfInputA, 0, 2);    // Add to GUI on second row
+        tfInputA.setOnMouseClicked(event -> {
+            tfSelect = /*"accountNum"*/ "A";
+            controller.mouseClick("A");
         });
 
-        tfInput = new TextField();  // To avoid errors from old code
+        // -alice tfInputA = new TextField();  // To avoid errors from old code
 
         // Creates a Text field for inputting account password
-        paswrd = new TextField();     // text field for numbers
-        paswrd.setEditable(false);     // Read only
-        grid.add(paswrd, 0, 3);    // Add to GUI on third row
-        paswrd.setOnMouseClicked(event -> {
-            tfSelect = "password";
-            controller.mouseClick("pass");
+        tfInputB = new TextField();     // text field for numbers
+        tfInputB.setEditable(false);     // Read only
+        grid.add(tfInputB, 0, 3);    // Add to GUI on third row
+        tfInputB.setOnMouseClicked(event -> {
+            tfSelect = /*"password"*/ "B";
+            controller.mouseClick("B");
         });
 
         // Create pin pad
@@ -418,23 +424,23 @@ class View {
         grid.add( taResult, 0, 1);    // add the scrolling window to GUI on third row
 
         // Creates a Text field for inputting account number
-        paswrd = new TextField();     // text field for numbers
-        paswrd.setEditable(false);     // Read only
-        grid.add(paswrd, 0, 2);    // Add to GUI on second row
-        paswrd.setOnMouseClicked(event -> {
-            tfSelect = "current password";
-            controller.mouseClick("curpass");
+        tfInputA = new TextField();     // text field for numbers
+        tfInputA.setEditable(false);     // Read only
+        grid.add(tfInputA, 0, 2);    // Add to GUI on second row
+        tfInputA.setOnMouseClicked(event -> {
+            tfSelect = "A";
+            controller.mouseClick("A");
         });
 
-        tfInput = new TextField();  // To avoid errors from old code
+        // -alice tfInputA = new TextField();  // To avoid errors from old code
 
         // Creates a Text field for inputting account password
-        newPaswrd = new TextField();     // text field for numbers
-        newPaswrd.setEditable(false);     // Read only
-        grid.add(newPaswrd, 0, 3);    // Add to GUI on third row
-        newPaswrd.setOnMouseClicked(event -> {
-            tfSelect = "new password";
-            controller.mouseClick("newpass");
+        tfInputB = new TextField();     // text field for numbers
+        tfInputB.setEditable(false);     // Read only
+        grid.add(tfInputB, 0, 3);    // Add to GUI on third row
+        tfInputB.setOnMouseClicked(event -> {
+            tfSelect = "B";
+            controller.mouseClick("B");
         });
 
         // Creates a return to menu button
@@ -487,10 +493,14 @@ class View {
         //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
         grid.add( taResult, 0, 1);    // Add the scrolling window to GUI on third row
 
-        tfInput = new TextField();
-        tfInput.setId("depositField");
-        tfInput.setEditable(false);     // Read only
-        grid.add(tfInput, 0, 2);
+        tfInputA = new TextField();
+        tfInputA.setId("depositField");
+        tfInputA.setEditable(false);     // Read only
+        tfInputA.setOnMouseClicked(event -> {
+            controller.mouseClick("A");
+        });
+        tfSelect = "A";
+        grid.add(tfInputA, 0, 2);
 
         // Creates a return to menu button
         goBack = new Button("Return to menu");
@@ -519,22 +529,23 @@ class View {
     // - msg → shown in the top message label
     // - tfInputMsg → shown in the text field (user input area)
     // - taResultMsg → shown in the text area (instructions / results)
-    public void update(String msg,String tfInputMsg,String taResultMsg)
+    public void update(String msg,String tfInputMsg, String fieldB, String taResultMsg)
     {
         laMsg.setText(msg);
         if (tfSelect == "accountNum"){
-            accNum.setText(tfInputMsg);     // Account number update
+            tfInputA.setText(tfInputMsg);     // Account number update
         } else if (tfSelect == "password"){
-            paswrd.setText(tfInputMsg);     // Password update
+            tfInputB.setText(tfInputMsg);     // Password update
         } else if (tfSelect == "current password"){
-            paswrd.setText(tfInputMsg);     // Password update
+            tfInputA.setText(tfInputMsg);     // Password update
         } else if (tfSelect == "new password"){
-            newPaswrd.setText(tfInputMsg);     // Password update
+            tfInputB.setText(tfInputMsg);     // Password update
         } else {
-            tfInput.setText(tfInputMsg);    // Number update
+            tfInputA.setText(tfInputMsg);    // Number update
         }
         // make into switch when ive figured the other stuff out -alice
-        tfInput.setText(tfInputMsg);    // Number update
+        tfInputA.setText(tfInputMsg);    // Number update
+        tfInputB.setText(fieldB);
         taResult.setText(taResultMsg);
 
         // LocalDate currentDate = LocalDate.now(); // Creates a date object with the current date

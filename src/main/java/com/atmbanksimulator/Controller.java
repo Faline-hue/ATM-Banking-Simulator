@@ -18,7 +18,7 @@ public class Controller {
                 UIModel.processNumber(action, field);
                 break;
             case "CLR":
-                UIModel.processClear();
+                UIModel.processClear(field);
                 break;
             case "Ent":
                 UIModel.processEnter();
@@ -49,17 +49,11 @@ public class Controller {
 
     void mouseClick( String action) {
         switch (action) {
-            case "acc":
-                UIModel.processClick("acc");
+            case "A":
+                UIModel.processClick("A");
                 break;
-            case "pass":
-                UIModel.processClick("pass");
-                break;
-            case "curpass":
-                UIModel.processClick("curpass");
-                break;
-            case "newpass":
-                UIModel.processClick("newpass");
+            case "B":
+                UIModel.processClick("B");
                 break;
         }
     }
