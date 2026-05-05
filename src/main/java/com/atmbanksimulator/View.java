@@ -94,9 +94,8 @@ class View {
         Button b = ((Button) event.getSource());
         String text = b.getText();   // get the button label
         System.out.println( "View::buttonClicked: label = "+ text );
-        controller.process( text, tfSelect );  // Pass it to the controller's process method
+        controller.process( text );  // Pass it to the controller's process method
     }
-    // potentially need new version of this for numbers only; need to pass in current focussed input field but only sometimes
 
     // This is how the View talks to the Controller
     // This method is called when the pin pad is pressed
@@ -106,7 +105,7 @@ class View {
         Button b = ((Button) event.getSource());
         String text = b.getText();   // get the button label
         System.out.println( "View::buttonClicked: label = "+ text );
-        controller.pinPad( text );  // Pass it to the controller's process method
+        controller.pinPad( text, tfSelect );  // Pass it to the controller's process method
     }
 
 
@@ -546,10 +545,10 @@ class View {
         taResult.setPrefHeight(100);       // Assign dimensions to the field
         grid.add( taResult, 0, 1);    // Add the scrolling window to GUI on third row
 
-        tfInput = new TextField();
-        tfInput.setId("withdrawField");
-        tfInput.setEditable(false);     // Read only
-        grid.add(tfInput, 0, 2);
+        tfInputA = new TextField();
+        tfInputA.setId("withdrawField");
+        tfInputA.setEditable(false);     // Read only
+        grid.add(tfInputA, 0, 2);
 
         // Creates a return to menu button
         goBack = new Button("Return to menu");

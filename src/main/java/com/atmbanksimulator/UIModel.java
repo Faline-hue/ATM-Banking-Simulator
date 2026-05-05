@@ -143,7 +143,7 @@ public class UIModel {
                 } else {
                     // Login failed: reset ATM and display error
                     message = "Login failed: Unknown Account/Password";
-                    System.out.println(accNumber + " " + accNumber);
+                    System.out.println(inputA + " " + inputB);
                     reset(message);
                 }
                 break;
