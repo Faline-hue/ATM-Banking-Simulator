@@ -32,15 +32,8 @@ class View {
     // Components (controls and layout) of the user interface
     private Label laMsg;        // Header at the top of the GUI
 
-    // these 4 all seem to be variations on the same thing: -alice
-    private TextField tfInput;  // Input field where numbers typed on the keypad appear
-    // is there a difference between tfSelect and tfInput? -alice
-    private TextField accNum;   // Input field for account number
-    private TextField paswrd;   // Input field for password
-    private TextField newPaswrd;// Input field for password change
-
-    private TextField tfInputA;    // view doesn't crae what's being entered; top field for all screens -alice
-    private TextField tfInputB;    // bottom field for screens with 2 -alice
+    private TextField tfInputA;    // view doesn't crae what's being entered; top field for all screens
+    private TextField tfInputB;    // bottom field for screens with 2 fields
 
     private Button goBack;       // Send data
     private TextArea taResult;  // Output area where instructions and results are displayed
@@ -48,7 +41,6 @@ class View {
     private TilePane buttonPane;// Container for ATM keypad buttons (tiled layout)
     private Label dateMsg;      // To display current date
     private Button btnWD;       // Send Withdraw data
-
 
 
     // start() is called from Main to set up the UI.
@@ -150,8 +142,6 @@ class View {
             tfSelect = /*"accountNum"*/ "A";
             controller.mouseClick("A");
         });
-
-        // -alice tfInputA = new TextField();  // To avoid errors from old code
 
         // Creates a Text field for inputting account password
         tfInputB = new TextField();     // text field for numbers
@@ -379,7 +369,6 @@ class View {
         goBack.setOnAction( this::buttonClicked );
         grid.add(goBack, 0, 2 );
 
-
         // Create pin pad
         buttonPane = pinPad();
         grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
@@ -431,8 +420,6 @@ class View {
             tfSelect = "A";
             controller.mouseClick("A");
         });
-
-        // -alice tfInputA = new TextField();  // To avoid errors from old code
 
         // Creates a Text field for inputting account password
         tfInputB = new TextField();     // text field for numbers
@@ -532,18 +519,6 @@ class View {
     public void update(String msg,String tfInputMsg, String fieldB, String taResultMsg)
     {
         laMsg.setText(msg);
-        if (tfSelect == "accountNum"){
-            tfInputA.setText(tfInputMsg);     // Account number update
-        } else if (tfSelect == "password"){
-            tfInputB.setText(tfInputMsg);     // Password update
-        } else if (tfSelect == "current password"){
-            tfInputA.setText(tfInputMsg);     // Password update
-        } else if (tfSelect == "new password"){
-            tfInputB.setText(tfInputMsg);     // Password update
-        } else {
-            tfInputA.setText(tfInputMsg);    // Number update
-        }
-        // make into switch when ive figured the other stuff out -alice
         tfInputA.setText(tfInputMsg);    // Number update
         tfInputB.setText(fieldB);
         taResult.setText(taResultMsg);

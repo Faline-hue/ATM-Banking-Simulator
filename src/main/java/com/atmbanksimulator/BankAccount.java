@@ -130,10 +130,11 @@ public class BankAccount implements Serializable {
     }
 
     //temporary change password
-    public void changePassword(String prevPassword, String newPassword) {
+    public boolean changePassword(String prevPassword, String newPassword) {
         if (checkPassword(prevPassword)){
             setAccountPassword(newPassword);
         }
+        return (checkPassword(newPassword));
     }
 }
 

@@ -35,16 +35,11 @@ public class UIModel {
 
     // Variables representing the state and data of the ATM UIModel
     private String state = STATE_SIGNIN_PAGE;    // Current state of the ATM
-    private String accNumber = "";              // Account number being typed
-    private String accPasswd = "";              // Password being typed
-    private String curPasswd = "";              // Current password being type
-    private String newPasswd = "";              // New password being typed
 
     // Variables shown on the View display
     private String message;                // Message label text
-    private String numberPadInput;         // Current number displayed in the TextField (as a string)
-    private String inputA;                  // top input field -alice
-    private String inputB;                  // bottom input field, if present -alice
+    private String inputA;                  // top input field
+    private String inputB;                  // bottom input field, if present
     private String result;                 // Contents of the TextArea (Could be multiple lines)
 
     // UIModel constructor: pass a Bank object that the ATM interacts with
@@ -75,7 +70,7 @@ public class UIModel {
         inputA = "";
         inputB = "";
         message = "Sign-In";
-        result = "An error has occured, \n please Sign-in again";
+        result = msg;
     }
 
     // Change the ATM state and print a debug message whenever the state changes
@@ -92,8 +87,7 @@ public class UIModel {
     // These process**** methods are called by the Controller
     // in response to specific button presses on the GUI.
 
-    // Handle a number button press: append the digit to numberPadInput
-    // needs to append to different input variable based on state -alice
+    // Handle a number button press: append the digit to the focussed field
     public void processNumber(String numberOnButton, String focusField) {
         if (focusField.equals("B")) {
             if (state.equals(STATE_SIGNIN_PAGE) || state.equals(STATE_CHANGE_PASS)) {
@@ -107,8 +101,7 @@ public class UIModel {
         update();
     }
 
-    // Handle the Clear button: reset the current number stored in numberPadInput
-    // clear the currently selected input field only -alice
+    // Handle the Clear button: reset the current number stored in the focussed field
     public void processClear(String field) {
         if (field.equals("A")) {
             if (!inputA.isEmpty()) {
@@ -156,15 +149,17 @@ public class UIModel {
             case STATE_CHANGE_PASS:
                     // Waiting for user's password details
                     // Will confirm password details
-                curPasswd = inputA;
-                newPasswd = inputB;
                 if (bank.checkPassword(inputA)){
                     // Current password entered correctly
-                    bank.changePassword(inputA, inputB); // need to change to only check current password once -alice
-                    result = "Password successfully updated\nYou may now return to menu";
-                    saveRead();
-                    save();
-                } else if(inputA == inputB){
+                     if (bank.changePassword(inputA, inputB)) {
+                         result = "Password successfully updated\nYou may now return to menu";
+                         saveRead();
+                         save();
+                     }
+                    else {
+                        result = "Password not updated due to error\nTry again or return to menu";
+                    }
+                } else if(inputA.equals(inputB)){
                     // Password isn't new
                     result = "New password is identical to current password\nPlease enter a new password";
                 }else {
@@ -176,7 +171,7 @@ public class UIModel {
                     // Waiting for user's deposit
                     // Will confirm daily deposit limit
                 processDeposit();
-
+                break;
             default:
                 // Do nothing for other states (user is already logged in)
         }
@@ -278,7 +273,7 @@ public class UIModel {
     public void processWithdraw(String action) {
         if (state.equals(STATE_WITHDRAW_PAGE)) {
             int amount = 0;
-            if (action != "Custom") {
+            if (!action.equals("Custom")) {
                 System.out.println(action);
                 amount = Integer.parseInt(action.replace("£", ""));
             }
@@ -386,19 +381,6 @@ public class UIModel {
         update();
     }
 
-    public void processChangePass() {
-        if (state.equals(STATE_CHANGE_PASS)) {
-            // the problem with this version is it can only ever read one input per screen at a time, and the change password screen has two inputs
-            // so it's hallucinating an input from somewhere -alice
-        }
-        else {
-            reset("You are not logged in");
-        }
-        save();
-        saveRead();
-        update();
-    }
-
     // Handle the Finish button:
     // - If the user is logged in, log out
     // - Otherwise, reset the ATM and display an error message
@@ -423,17 +405,15 @@ public class UIModel {
     // Handle clicking on text field during sign-in:
     public void processClick(String action){
         switch (action){
-            /*case "acc": case "curpass":*/ case "A":
+            case "A":
                 inputA = "";
                 break;
-            /*case "pass": case "newpass":*/ case "B":
+            case "B":
                 inputB = "";
                 break;
         }
         update();
     }
-    // i think this is causing a problem with the logging in and changing passwords -alice
-    // should update input variables every time they change, not just when that field/the opposite field is clicked -alice
 
     // Notify the View of changes by calling its update method
     private void update() {
