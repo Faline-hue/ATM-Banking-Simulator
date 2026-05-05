@@ -21,6 +21,7 @@ public class BankAccount implements Serializable {
     protected int ylyDepLimit = 0;
     protected int yCapD = 0;
     protected LocalDate acsDate = null;
+    protected boolean inactive = false;
 
     public BankAccount() {}                 // Constructor
     public BankAccount(String a, String p, int b) {
@@ -34,6 +35,7 @@ public class BankAccount implements Serializable {
         this.ylyDepLimit = 20000;           // Limit on how much can be deposited yearly
         this.yCapD = 0;                     // Counts how much has been deposited this year
         this.acsDate = LocalDate.now();     // Default assignment of current date when created
+        this.inactive = false;              // Used to disable an account when it gets locked
     }
 
     // Getters - utilised by methods
@@ -109,6 +111,10 @@ public class BankAccount implements Serializable {
     // Method to retrieve the next yearly reset for deposit limit
     public LocalDate firstOfJanuary() {
         return this.acsDate.withMonth(1).withDayOfMonth(1).withYear(this.acsDate.getYear() + 1);
+    }
+
+    public void lockout() {
+        this.inactive = true;
     }
 
     // Temporarily made separate getters and setters for subclasses - I feel like the public account number and password should be different?

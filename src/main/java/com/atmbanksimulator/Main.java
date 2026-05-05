@@ -2,7 +2,6 @@ package com.atmbanksimulator;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 
@@ -19,10 +18,6 @@ public class Main extends Application {
         // Creates a Bank
         Bank bank = new Bank();
 
-        // Creates an ObjectMapper
-        // Used to read/write JSON files
-        ObjectMapper objectMapper = new ObjectMapper();
-
         // Getting the file
         File f = new File("bank.ser");
 
@@ -30,7 +25,7 @@ public class Main extends Application {
         if (f.exists()){
             bank.accounts.addAll(bank.load());
         } else {
-            // Used to assign the initial accounts before saving to JSON file
+            // Used to assign the initial accounts before saving to file
             bank.addBankAccount("10001", "11111", 100, "Basic");
             bank.addBankAccount("10002", "22222", 50, "Basic");
             bank.addBankAccount("10003", "33333", 300, "Student" );

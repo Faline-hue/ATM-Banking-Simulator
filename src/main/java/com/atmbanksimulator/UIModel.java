@@ -27,10 +27,11 @@ public class UIModel {
     private final String STATE_SIGNIN_PAGE = "Sign_In";     // 2. Sign-In page, waiting for account number and password
     private final String STATE_MAINMENU_PAGE = "Main_Menu"; // 3. Logged in (awaiting choice)
     private final String STATE_WITHDRAW_PAGE = "Withdraw";  // 4. Waiting for user to select amount to withdraw
-    private final String STATE_DEPOSIT_PAGE = "Deposit";    // 5. Waiting for user to enter amount to deposit
-    private final String STATE_BALANCE_PAGE = "Balance";    // 6. Showing balance of currently logged in account
-    private final String STATE_CHANGE_PASS = "Change_Pass"; // 7. Sign-In page, allows user to change password
-    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 8. Goodbye page, says goodbye to user, loops back to welcome page
+    private final String STATE_WITHDRAW_CUSTOM = "Withdraw_Custom"; // 5. Waiting for user to enter amount to withdraw
+    private final String STATE_DEPOSIT_PAGE = "Deposit";    // 6. Waiting for user to enter amount to deposit
+    private final String STATE_BALANCE_PAGE = "Balance";    // 7. Showing balance of currently logged in account
+    private final String STATE_CHANGE_PASS = "Change_Pass"; // 8. Sign-In page, allows user to change password
+    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 9. Goodbye page, says goodbye to user, loops back to welcome page
 
 
     // Variables representing the state and data of the ATM UIModel
@@ -116,6 +117,7 @@ public class UIModel {
                     // Will attempt to log in with given details
                 accPasswd = numberPadInput;
                 numberPadInput = "";
+                // if ( bank.ch)
                 if ( bank.login(accNumber, accPasswd) )
                 {
                     // Successful login: change state to STATE_MAINMENU_PAGE and provide instructions
@@ -153,11 +155,18 @@ public class UIModel {
                 break;
             case STATE_DEPOSIT_PAGE:
                     // Waiting for user's deposit
-                    // Will confirm daily deposit limit
+                    // Will confirm daily and yearly deposit limit
                 processDeposit();
+                break;
+            case STATE_WITHDRAW_CUSTOM:
+                    // Waiting for user's withdrawal
+                    // Will confirm daily withdrawal limit
+                processWithdraw("Custom");
+                break;
 
             default:
                 // Do nothing for other states (user is already logged in)
+                break;
         }
 
         update(); // Refresh the GUI to show messages and input
@@ -204,6 +213,13 @@ public class UIModel {
                 message = "Main Menu";
                 result = "Please select the option you would like to access";
                 break;
+            case "Custom":
+                setState(STATE_WITHDRAW_CUSTOM);
+                hideScene();
+                view.withdrawsCustom(View.stage);
+                message = "Enter amount to withdraw";
+                result = "Please enter the amount you want to withdraw";
+                break;
             case "Sign-Out":
                 setState(STATE_GOODBYE_PAGE);
                 // INSERT GOODBYE PAGE SCENE AND THEN RETURN TO WELCOME PAGE
@@ -231,22 +247,6 @@ public class UIModel {
         }
     }
 
-    /*
-    // Handle the Balance button:
-    // - If the user is logged in, retrieve the current balance and update messages/results accordingly
-    // - Otherwise, reset the ATM and display an error message
-    public void processBalance() {
-        if (state.equals(STATE_LOGGED_IN) ) {
-            numberPadInput = "";
-            message = "Balance Available";
-            result = "Your Balance is: " + bank.getBalance();
-        } else {
-            reset("You are not logged in");
-        }
-        update();
-    }
-    */
-
     // Handle the Withdraw button:
     // - If the user is logged in, attempt to withdraw the amount entered;
     //  - If the user has exceeded their withdrawal limit for the day it will fail and notify them
@@ -254,11 +254,13 @@ public class UIModel {
     // - otherwise, reset the ATM and display an error message.
     // - Reads the amount from numberPadInput, validates it, and updates messages/results accordingly.
     public void processWithdraw(String action) {
-        if (state.equals(STATE_WITHDRAW_PAGE)) {
+        if (state.equals(STATE_WITHDRAW_PAGE) || state.equals(STATE_WITHDRAW_CUSTOM)) {
             int amount = 0;
             if (action != "Custom") {
                 System.out.println(action);
                 amount = Integer.parseInt(action.replace("£", ""));
+            } else if (action == "Custom") {
+                amount = parseValidAmount(numberPadInput);
             }
             if (amount > 0) {
                 if (bank.withdraw(amount)) {
@@ -275,7 +277,7 @@ public class UIModel {
                         if (bank.getDailyCapWD() == bank.getWithdrawalLimit()) {
                             // Daily withdraw limit is reached
                             message = "Withdraw Failed";
-                            result = "You've reached your withdraw limit for the day";
+                            result = "You've reached your withdrawal limit for the day";
                         } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCapWD())) {
                             // Not enough left on user's withdraw limit
                             message = "Withdraw Failed";
