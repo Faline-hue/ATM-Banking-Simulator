@@ -405,17 +405,18 @@ public class UIModel {
             case "pass":
                 accNumber = numberPadInput;
                 break;
-            case "curpass":
+            /*case "curpass":
                 // this doesn't do anything i don't know where this is from
                 curPasswd = numberPadInput;
                 break;
             case "newpass":
                 newPasswd = numberPadInput;
-                break;
+                break;*/
         }
         numberPadInput = "";
         update();
     }
+    // i think this is causing a problem with the logging in and changing passwords
 
     // Notify the View of changes by calling its update method
     private void update() {
