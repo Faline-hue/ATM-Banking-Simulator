@@ -43,6 +43,8 @@ public class UIModel {
     // Variables shown on the View display
     private String message;                // Message label text
     private String numberPadInput;         // Current number displayed in the TextField (as a string)
+    private String inputA;
+    private String inputB;                  // inputs for when there's two fields onscreen
     private String result;                 // Contents of the TextArea (Could be multiple lines)
 
     // UIModel constructor: pass a Bank object that the ATM interacts with
@@ -89,7 +91,34 @@ public class UIModel {
     // in response to specific button presses on the GUI.
 
     // Handle a number button press: append the digit to numberPadInput
-    public void processNumber(String numberOnButton) {
+    // needs to append to different input variable based on state -alice
+    public void processNumber(String numberOnButton, String focusField) {
+        switch (state) {
+            case STATE_SIGNIN_PAGE:
+                if (focusField.equals("accountNum")) {
+                    accNumber += numberOnButton;
+                }
+                else if (focusField.equals("password")) {
+                    accPasswd += numberOnButton;
+                }
+                else {
+                    numberPadInput += numberOnButton;
+                }
+                break;
+            case STATE_CHANGE_PASS:
+                if (focusField.equals("current password")) {
+                    curPasswd += numberOnButton;
+                }
+                else if (focusField.equals("new password")) {
+                    newPasswd += numberOnButton;
+                }
+                else {
+                    numberPadInput += numberOnButton;
+                }
+                break;
+            default:
+                numberPadInput += numberOnButton;
+        }
         numberPadInput += numberOnButton;
         update();
     }
@@ -114,7 +143,7 @@ public class UIModel {
             case STATE_SIGNIN_PAGE:
                     // Waiting for user's account details
                     // Will attempt to log in with given details
-                accPasswd = numberPadInput;
+                // accPasswd = numberPadInput; -alice
                 numberPadInput = "";
                 if ( bank.login(accNumber, accPasswd) )
                 {
@@ -135,11 +164,11 @@ public class UIModel {
             case STATE_CHANGE_PASS:
                     // Waiting for user's password details
                     // Will confirm password details
-                newPasswd = numberPadInput;
+                // newPasswd = numberPadInput; -alice
                 numberPadInput = "";
                 if (bank.checkPassword(curPasswd)){
                     // Current password entered correctly
-                    bank.changePassword(curPasswd, newPasswd);
+                    bank.changePassword(curPasswd, newPasswd); // need to change to only check current password once -alice
                     result = "Password successfully updated\nYou may now return to menu";
                     saveRead();
                     save();
@@ -365,7 +394,7 @@ public class UIModel {
     public void processChangePass() {
         if (state.equals(STATE_CHANGE_PASS)) {
             // the problem with this version is it can only ever read one input per screen at a time, and the change password screen has two inputs
-            // so it's hallucinating an input from somewhere
+            // so it's hallucinating an input from somewhere -alice
         }
         else {
             reset("You are not logged in");
@@ -398,25 +427,25 @@ public class UIModel {
 
     // Handle clicking on text field during sign-in:
     public void processClick(String action){
-        switch (action){
+        /*switch (action){
             case "acc":
                 accPasswd = numberPadInput;
                 break;
             case "pass":
                 accNumber = numberPadInput;
                 break;
-            /*case "curpass":
-                // this doesn't do anything i don't know where this is from
+            case "curpass":
                 curPasswd = numberPadInput;
                 break;
             case "newpass":
                 newPasswd = numberPadInput;
-                break;*/
-        }
+                break;
+        }*/
         numberPadInput = "";
         update();
     }
-    // i think this is causing a problem with the logging in and changing passwords
+    // i think this is causing a problem with the logging in and changing passwords -alice
+    // should update input variables every time they change, not just when that field/the opposite field is clicked -alice
 
     // Notify the View of changes by calling its update method
     private void update() {

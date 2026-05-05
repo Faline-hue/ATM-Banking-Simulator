@@ -32,6 +32,7 @@ class View {
     // Components (controls and layout) of the user interface
     private Label laMsg;        // Header at the top of the GUI
     private TextField tfInput;  // Input field where numbers typed on the keypad appear
+    // is there a difference between tfSelect and tfInput? -alice
     private TextField accNum;   // Input field for account number
     private TextField paswrd;   // Input field for password
     private TextField newPaswrd;// Input field for password change
@@ -95,8 +96,9 @@ class View {
         Button b = ((Button) event.getSource());
         String text = b.getText();   // get the button label
         System.out.println( "View::buttonClicked: label = "+ text );
-        controller.process( text );  // Pass it to the controller's process method
+        controller.process( text, tfSelect );  // Pass it to the controller's process method
     }
+    // potentially need new version of this for numbers only; need to pass in current focussed input field but only sometimes
 
 
 
@@ -531,6 +533,7 @@ class View {
         } else {
             tfInput.setText(tfInputMsg);    // Number update
         }
+        // make into switch when ive figured the other stuff out -alice
         tfInput.setText(tfInputMsg);    // Number update
         taResult.setText(taResultMsg);
 
