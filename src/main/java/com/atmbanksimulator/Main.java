@@ -2,7 +2,6 @@ package com.atmbanksimulator;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 
@@ -18,10 +17,6 @@ public class Main extends Application {
 
         // Creates a Bank
         Bank bank = new Bank();
-
-        // Creates an ObjectMapper
-        // Used to read/write JSON files
-        ObjectMapper objectMapper = new ObjectMapper();
 
         // Getting the file
         File f = new File("bank.ser");

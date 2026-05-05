@@ -157,13 +157,16 @@ public class UIModel {
                     // Waiting for user's deposit
                     // Will confirm daily and yearly deposit limit
                 processDeposit();
+                break;
             case STATE_WITHDRAW_CUSTOM:
                     // Waiting for user's withdrawal
                     // Will confirm daily withdrawal limit
                 processWithdraw("Custom");
+                break;
 
             default:
                 // Do nothing for other states (user is already logged in)
+                break;
         }
 
         update(); // Refresh the GUI to show messages and input
@@ -244,22 +247,6 @@ public class UIModel {
         }
     }
 
-    /*
-    // Handle the Balance button:
-    // - If the user is logged in, retrieve the current balance and update messages/results accordingly
-    // - Otherwise, reset the ATM and display an error message
-    public void processBalance() {
-        if (state.equals(STATE_LOGGED_IN) ) {
-            numberPadInput = "";
-            message = "Balance Available";
-            result = "Your Balance is: " + bank.getBalance();
-        } else {
-            reset("You are not logged in");
-        }
-        update();
-    }
-    */
-
     // Handle the Withdraw button:
     // - If the user is logged in, attempt to withdraw the amount entered;
     //  - If the user has exceeded their withdrawal limit for the day it will fail and notify them
@@ -290,7 +277,7 @@ public class UIModel {
                         if (bank.getDailyCapWD() == bank.getWithdrawalLimit()) {
                             // Daily withdraw limit is reached
                             message = "Withdraw Failed";
-                            result = "You've reached your withdraw limit for the day";
+                            result = "You've reached your withdrawal limit for the day";
                         } else if (amount > (bank.getWithdrawalLimit() - bank.getDailyCapWD())) {
                             // Not enough left on user's withdraw limit
                             message = "Withdraw Failed";
