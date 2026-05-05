@@ -1,0 +1,92 @@
+
+#Layout {
+    -fx-grid-lines-visible: false;
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+    -fx-padding: 10;
+}
+/* CSS for the Pinpad */
+#Buttons {
+    -fx-pref-columns: 6;
+    -fx-pref-tile-width: 75;
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+
+
+}
+/* CSS for the menu Buttons */
+#menu {
+    -fx-pref-columns: 6;
+    -fx-pref-tile-width: 500;
+    -fx-hgap: 9;
+    -fx-vgap: 9;
+
+
+}
+#withdrawMenu {
+
+
+}
+
+/* default CSS for the buttons */
+
+.button {
+    -fx-font: bold 16pt "baskerville";
+
+
+
+
+
+}
+
+/* default CSS for the label text */
+.label {
+    -fx-font: bold 30pt "Helvetica";  /* font size and weight */
+    -fx-text-fill: darkgreen;            /* text color */
+    -fx-text-alignment: center;
+
+}
+/* default CSS for the textfield text */
+.text-field {
+    -fx-font: bold 14pt "Avenir"; /* or any font size you want */
+
+
+}
+/* default CSS sign in page label */
+#instructions {
+    -fx-font: bold 20pt "Avenir";
+
+}
+#instructionsDeposit {
+    -fx-font: bold 20pt "Avenir";
+
+}
+
+.text-area {
+    -fx-font: bold 14pt "Avenir"; /* or any font size you want */
+
+}
+
+/* CSS for the welcome textbox */
+#welcome {
+    -fx-font: bold 20pt "Avenir";
+
+
+
+}
+/* CSS for the welcome label */
+
+#titleWelcome {
+    -fx-font: bold 30pt "helvetica";
+
+
+
+}
+/* CSS for the sign in label */
+#titleSignIn {
+    -fx-font: bold 30pt "helvetica";
+
+
+
+}
+
