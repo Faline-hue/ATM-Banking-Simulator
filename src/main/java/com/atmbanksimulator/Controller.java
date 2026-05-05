@@ -23,9 +23,6 @@ public class Controller {
             case "Ent":
                 UIModel.processEnter();
                 break;
-            //case "Sign-Out":
-               // UIModel.processFinish();
-                //break;
             case "Withdraw", "Deposit", "Balance", "Change Password", "Sign-Out":
                 UIModel.stageManager(action);
                 break;

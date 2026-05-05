@@ -16,7 +16,7 @@ import javafx.geometry.*;
 // it only updates the display when notified by the UIModel.
 
 class View {
-    int H = 650;         // Height of window pixels
+    int H = 700;         // Height of window pixels
     int W = 750;         // Width  of window pixels
 
     Controller controller; // Reference to the Controller (part of the MVC setup)
@@ -199,6 +199,9 @@ class View {
         // Creates a Text field for inputting account number
         accNum = new TextField();     // text field for numbers
         accNum.setEditable(false);     // Read only
+        accNum.setMaxWidth(400);
+        accNum.setPadding(new Insets(30, 0, 0, 0));
+        GridPane.setHalignment(accNum, HPos.CENTER);
         grid.add(accNum, 0, 2);    // Add to GUI on second row
         accNum.setOnMouseClicked(event -> {
             tfSelect = "accountNum";
@@ -210,6 +213,9 @@ class View {
         // Creates a Text field for inputting account password
         paswrd = new TextField();     // text field for numbers
         paswrd.setEditable(false);     // Read only
+        paswrd.setMaxWidth(400);
+        paswrd.setPadding(new Insets(0, 0, 30, 0));
+        GridPane.setHalignment(paswrd, HPos.CENTER);
         grid.add(paswrd, 0, 3);    // Add to GUI on third row
         paswrd.setOnMouseClicked(event -> {
             tfSelect = "password";
@@ -475,14 +481,14 @@ class View {
         taResult.setId("instructions"); // CSS ID for designs
         taResult.setEditable(false);       // Read only
         taResult.setPrefHeight(100);       // Assign dimensions to the field
-        //scrollPane  = new ScrollPane();    // create a scrolling window
-        //scrollPane.setContent(taResult);   // put the text area 'inside' the scrolling window
-        //scrollPane.setPrefHeight(100);     // Assign dimensions to the field
         grid.add( taResult, 0, 1);    // add the scrolling window to GUI on third row
 
         // Creates a Text field for inputting account number
         paswrd = new TextField();     // text field for numbers
         paswrd.setEditable(false);     // Read only
+        paswrd.setMaxWidth(400);
+        paswrd.setPadding(new Insets(30, 0, 0, 0));
+        GridPane.setHalignment(paswrd, HPos.CENTER);
         grid.add(paswrd, 0, 2);    // Add to GUI on second row
         paswrd.setOnMouseClicked(event -> {
             tfSelect = "current password";
@@ -494,6 +500,9 @@ class View {
         // Creates a Text field for inputting account password
         newPaswrd = new TextField();     // text field for numbers
         newPaswrd.setEditable(false);     // Read only
+        newPaswrd.setMaxWidth(400);
+        newPaswrd.setPadding(new Insets(0, 0, 30, 0));
+        GridPane.setHalignment(newPaswrd, HPos.CENTER);
         grid.add(newPaswrd, 0, 3);    // Add to GUI on third row
         newPaswrd.setOnMouseClicked(event -> {
             tfSelect = "new password";
