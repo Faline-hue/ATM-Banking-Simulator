@@ -20,6 +20,7 @@ public class Bank implements Serializable {
     // Instance variables storing bank information
     List<BankAccount> accounts = new ArrayList<BankAccount>();        // Array to hold BankAccount objects
     private BankAccount loggedInAccount = null;                                  // Currently logged-in account ('null' if no one is logged in)
+    private int i = 0;
 
     // A method to create new BankAccount - this is known as a 'factory method' and is a more
     // flexible way to do it than just using the 'new' keyword directly.
@@ -74,6 +75,8 @@ public class Bank implements Serializable {
                 loggedInAccount = b;
                 loggedInAccount.accessDate();   // Update the accounts limits
                 return true;
+            } else if (b.checkAccountNumber(accountNumber)) {
+
             }
         }
         // not found - return false
@@ -250,6 +253,20 @@ public class Bank implements Serializable {
         else {
             return false;
         }
+    }
+
+
+    public boolean checkAccountNumber(String a) {
+        for (BankAccount b: accounts) {
+            if (b.checkAccountNumber(a)) {
+                i++;
+                if (i == 3){
+                    i = 0; 
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // Used to read the array list of accounts in UIModel

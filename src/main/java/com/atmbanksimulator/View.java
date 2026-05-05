@@ -73,7 +73,7 @@ class View {
                 if ( !text.isEmpty() ) {
                     // non-empty string - make a button
                     Button btn = new Button( text );
-                    btn.setOnAction( this::buttonClicked );
+                    btn.setOnAction( this::pinPadClicked );
                     // Register event handler: call buttonClicked() whenever this button is pressed
                     buttonPane.getChildren().add( btn );    // add this button to tiled pane
                 } else {
@@ -97,6 +97,17 @@ class View {
         controller.process( text, tfSelect );  // Pass it to the controller's process method
     }
     // potentially need new version of this for numbers only; need to pass in current focussed input field but only sometimes
+
+    // This is how the View talks to the Controller
+    // This method is called when the pin pad is pressed
+    // It fetches the label on the button and passes it to the controller's process method
+    private void pinPadClicked(ActionEvent event) {
+        // This line asks the event to provide the actual Button object that was clicked
+        Button b = ((Button) event.getSource());
+        String text = b.getText();   // get the button label
+        System.out.println( "View::buttonClicked: label = "+ text );
+        controller.pinPad( text );  // Pass it to the controller's process method
+    }
 
 
 
@@ -488,6 +499,57 @@ class View {
         });
         tfSelect = "A";
         grid.add(tfInputA, 0, 2);
+
+        // Creates a return to menu button
+        goBack = new Button("Return to menu");
+        goBack.setId("return");
+        goBack.setOnAction( this::buttonClicked );
+        grid.add(goBack, 0, 3 );
+
+
+        // Create pin pad
+        buttonPane = pinPad();
+        grid.add(buttonPane,0,4); // Add the tiled pane of buttons to the main grid
+
+        // add the complete GUI to the window and display it
+        Scene deposit = new Scene(grid, W, H);
+        deposit.getStylesheets().add("atm.css"); // tell to use our CSS file
+        window.setScene(deposit);
+    }
+    // This method is called when the user selects Custom in the withdrawals page
+    // Fills in the contents of the scene to create a Withdrawals page
+    //
+    public void withdrawsCustom(Stage window){
+        // Creates a Grid Pane
+        grid = new GridPane();  // Page Layout
+        grid.setId("layout");   // CSS ID
+
+        // Setting the padding
+        grid.setPadding(new Insets(25,25,25,25));
+
+        // Setting the vert and hori gaps between the columns
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        // Setting the grid alignment
+        grid.setAlignment(Pos.CENTER);
+
+        // Creates a label title
+        laMsg = new Label();     // Title bar at the top
+        laMsg.setId("title");                   // CSS ID for designs
+        grid.add(laMsg, 0, 0);         // Add to GUI at the top
+
+        // Creates a Text Area for instructions
+        taResult = new TextArea();   // Instructions
+        taResult.setId("instructions"); // CSS ID for designs
+        taResult.setEditable(false);       // Read only
+        taResult.setPrefHeight(100);       // Assign dimensions to the field
+        grid.add( taResult, 0, 1);    // Add the scrolling window to GUI on third row
+
+        tfInput = new TextField();
+        tfInput.setId("withdrawField");
+        tfInput.setEditable(false);     // Read only
+        grid.add(tfInput, 0, 2);
 
         // Creates a return to menu button
         goBack = new Button("Return to menu");
