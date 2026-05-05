@@ -116,6 +116,7 @@ public class UIModel {
                     // Will attempt to log in with given details
                 accPasswd = numberPadInput;
                 numberPadInput = "";
+                if ( bank.ch)
                 if ( bank.login(accNumber, accPasswd) )
                 {
                     // Successful login: change state to STATE_MAINMENU_PAGE and provide instructions

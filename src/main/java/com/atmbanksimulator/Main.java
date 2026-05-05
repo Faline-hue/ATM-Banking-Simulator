@@ -30,7 +30,7 @@ public class Main extends Application {
         if (f.exists()){
             bank.accounts.addAll(bank.load());
         } else {
-            // Used to assign the initial accounts before saving to JSON file
+            // Used to assign the initial accounts before saving to file
             bank.addBankAccount("10001", "11111", 100, "Basic");
             bank.addBankAccount("10002", "22222", 50, "Basic");
             bank.addBankAccount("10003", "33333", 300, "Student" );
