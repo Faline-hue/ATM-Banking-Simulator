@@ -226,9 +226,12 @@ public class Bank implements Serializable {
     }
 
     // attempt to change password of the logged-in account
-    public void changePassword(String prevPass, String newPass) {
+    public boolean changePassword(String prevPass, String newPass) {
         if (loggedIn()) {
-            loggedInAccount.changePassword(prevPass, newPass);
+            return loggedInAccount.changePassword(prevPass, newPass);
+        }
+        else {
+            return false;
         }
     }
 
