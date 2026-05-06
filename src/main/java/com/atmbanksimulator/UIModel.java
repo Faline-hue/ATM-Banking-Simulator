@@ -31,19 +31,16 @@ public class UIModel {
     private final String STATE_DEPOSIT_PAGE = "Deposit";    // 6. Waiting for user to enter amount to deposit
     private final String STATE_BALANCE_PAGE = "Balance";    // 7. Showing balance of currently logged in account
     private final String STATE_CHANGE_PASS = "Change_Pass"; // 8. Sign-In page, allows user to change password
-    private final String STATE_GOODBYE_PAGE = "Change_Pass"; // 9. Goodbye page, says goodbye to user, loops back to welcome page
+    private final String STATE_GOODBYE_PAGE = "Goodbye"; // 9. Goodbye page, says goodbye to user, loops back to welcome page
 
 
     // Variables representing the state and data of the ATM UIModel
     private String state = STATE_SIGNIN_PAGE;    // Current state of the ATM
-    private String accNumber = "";              // Account number being typed
-    private String accPasswd = "";              // Password being typed
-    private String curPasswd = "";              // Current password being type
-    private String newPasswd = "";              // New password being typed
 
     // Variables shown on the View display
     private String message;                // Message label text
-    private String numberPadInput;         // Current number displayed in the TextField (as a string)
+    private String inputA;                  // top input field
+    private String inputB;                  // bottom input field, if present
     private String result;                 // Contents of the TextArea (Could be multiple lines)
 
     // UIModel constructor: pass a Bank object that the ATM interacts with
@@ -56,10 +53,13 @@ public class UIModel {
     // - Clear the numberPadInput - numbers displayed in the TextField
     // - Display the welcome message and user instructions
     public void initialise() {
-        setState(STATE_SIGNIN_PAGE);
-        numberPadInput = "";
-        message = "Sign-In";
-        result = "Enter your Account Number and Password";
+        setState(STATE_WELCOME_PAGE);
+        view.welcomePage(View.stage);
+        inputA = "";
+        message = "Welcome to Emalka Banking";
+        result = "         Free cash Withdrawals, Balance enquires \n                                   and Deposits.\n \n" +
+                "                         Press Enter to continue";
+
         update();
     }
 
@@ -70,9 +70,10 @@ public class UIModel {
     private void reset(String msg) {
         setState(STATE_SIGNIN_PAGE);
         view.signInPage(View.stage);
-        numberPadInput = "";
+        inputA = "";
+        inputB = "";
         message = "Sign-In";
-        result = "An error has occured, \n please Sign-in again";
+        result = msg;
     }
 
     // Change the ATM state and print a debug message whenever the state changes
@@ -89,18 +90,37 @@ public class UIModel {
     // These process**** methods are called by the Controller
     // in response to specific button presses on the GUI.
 
-    // Handle a number button press: append the digit to numberPadInput
-    public void processNumber(String numberOnButton) {
-        numberPadInput += numberOnButton;
+    // Handle a number button press: append the digit to the focussed field
+    public void processNumber(String numberOnButton, String focusField) {
+        if (focusField.equals("B")) {
+            if (state.equals(STATE_SIGNIN_PAGE) || state.equals(STATE_CHANGE_PASS)) {
+                inputB += numberOnButton;
+            } else if(state.equals(STATE_WITHDRAW_CUSTOM)){
+                inputA += numberOnButton;
+            }
+        }
+        else {
+            inputA += numberOnButton;
+        }
+
         update();
     }
 
-    // Handle the Clear button: reset the current number stored in numberPadInput
-    public void processClear() {
-        if (!numberPadInput.isEmpty()) {
-            numberPadInput = "";
-            message = "Input Cleared";
-            update();
+    // Handle the Clear button: reset the current number stored in the focussed field
+    public void processClear(String field) {
+        if (field.equals("A")) {
+            if (!inputA.isEmpty()) {
+                inputA = "";
+                message = "Input Cleared";
+                update();
+            }
+        }
+        else {
+            if (!inputB.isEmpty()) {
+                inputB = "";
+                message = "Input Cleared";
+                update();
+            }
         }
     }
 
@@ -112,13 +132,17 @@ public class UIModel {
         // The action depends on the current ATM state
         switch ( state )
         {
+            case STATE_WELCOME_PAGE:
+                setState(STATE_SIGNIN_PAGE);
+                hideScene();
+                view.signInPage(View.stage);
+                message = "Sign-In";
+                result = "  Please enter your Account number and Password";
+                break;
             case STATE_SIGNIN_PAGE:
                     // Waiting for user's account details
                     // Will attempt to log in with given details
-                accPasswd = numberPadInput;
-                numberPadInput = "";
-                // if ( bank.ch)
-                if ( bank.login(accNumber, accPasswd) )
+                if ( bank.login(inputA, inputB) )
                 {
                     // Successful login: change state to STATE_MAINMENU_PAGE and provide instructions
                     setState(STATE_MAINMENU_PAGE);
@@ -130,22 +154,24 @@ public class UIModel {
                 } else {
                     // Login failed: reset ATM and display error
                     message = "Login failed: Unknown Account/Password";
-                    System.out.println(accNumber + " " + accNumber);
+                    System.out.println(inputA + " " + inputB);
                     reset(message);
                 }
                 break;
             case STATE_CHANGE_PASS:
                     // Waiting for user's password details
                     // Will confirm password details
-                newPasswd = numberPadInput;
-                numberPadInput = "";
-                if (bank.checkPassword(curPasswd)){
+                if (bank.checkPassword(inputA)){
                     // Current password entered correctly
-                    bank.changePassword(curPasswd, newPasswd);
-                    result = "Password successfully updated\nYou may now return to menu";
-                    saveRead();
-                    save();
-                } else if(curPasswd == newPasswd){
+                     if (bank.changePassword(inputA, inputB)) {
+                         result = "Password successfully updated\nYou may now return to menu";
+
+                         save();
+                     }
+                    else {
+                        result = "Password not updated due to error\nTry again or return to menu";
+                    }
+                } else if(inputA.equals(inputB)){
                     // Password isn't new
                     result = "New password is identical to current password\nPlease enter a new password";
                 }else {
@@ -164,11 +190,26 @@ public class UIModel {
                 processWithdraw("Custom");
                 break;
 
+            case STATE_GOODBYE_PAGE:
+                if (inputA.equals(""))
+                {
+                    // Bring user back to the welcome page
+                    setState(STATE_WELCOME_PAGE);
+                    hideScene();
+                    view.welcomePage(View.stage);
+                    message = "Welcome to Emalka Banking";
+                    result = "         Free cash Withdrawals, Balance enquires \n                                   and Deposits.\n \n" +
+                            "                         Press Enter to continue";
+
+                }
+                break;
             default:
                 // Do nothing for other states (user is already logged in)
                 break;
-        }
 
+        }
+        inputA = "";
+        inputB = "";
         update(); // Refresh the GUI to show messages and input
     }
 
@@ -197,7 +238,7 @@ public class UIModel {
                 hideScene();
                 view.balance(View.stage);
                 message = "Your account balance is:";
-                result = Integer.toString(bank.getBalance());
+                result = "£" + Integer.toString(bank.getBalance());
                 break;
             case "Change Password":
                 setState(STATE_CHANGE_PASS);
@@ -221,8 +262,16 @@ public class UIModel {
                 result = "Please enter the amount you want to withdraw";
                 break;
             case "Sign-Out":
+                //goodbye page, Logs the user out
                 setState(STATE_GOODBYE_PAGE);
-                // INSERT GOODBYE PAGE SCENE AND THEN RETURN TO WELCOME PAGE
+                bank.logout();
+                hideScene();
+                view.welcomePage(View.stage);
+                message = "Sign-Out";
+                result = "    Thankyou for Banking with Emalka! \n \n" +
+                        "          Press Enter to continue";
+
+
                 break;
 
         }
@@ -256,17 +305,17 @@ public class UIModel {
     public void processWithdraw(String action) {
         if (state.equals(STATE_WITHDRAW_PAGE) || state.equals(STATE_WITHDRAW_CUSTOM)) {
             int amount = 0;
-            if (action != "Custom") {
+            if (!action.equals("Custom")) {
                 System.out.println(action);
                 amount = Integer.parseInt(action.replace("£", ""));
-            } else if (action == "Custom") {
-                amount = parseValidAmount(numberPadInput);
+            } else if (action.equals("Custom")) {
+                amount = parseValidAmount(inputA);
             }
             if (amount > 0) {
                 if (bank.withdraw(amount)) {
                     // If balance allows, will return true
                     message = "Withdraw Successful";
-                    result = "Withdrawn: " + amount;
+                    result = "Withdrawn: £" + amount;
                 } else if (!bank.withdraw(amount)) {
                     // If balance doesn't allow, will return false
                     if (amount > bank.getBalance() ){
@@ -298,13 +347,14 @@ public class UIModel {
                 message = "Invalid Amount";
                 result = "An error has occured \nPlease reselect how much you want to withdraw";
             }
-            numberPadInput = "";
+            inputA = "";
+            inputB = "";
         }
         else {
             reset("You are not logged in");
         }
         save(); //- Will save data to a serialized file for loading
-        saveRead(); // Will save data to a readable file for testing
+
         update();
     }
 
@@ -314,12 +364,12 @@ public class UIModel {
     // - Otherwise, reset the ATM and display an error message
     public void processDeposit() {
         if (state.equals(STATE_DEPOSIT_PAGE)) {
-            int amount = parseValidAmount(numberPadInput);
+            int amount = parseValidAmount(inputA);
             if (amount > 0) {
                 if (bank.deposit(amount)) {
                     // If balance allows, will return true
                     message = "Deposit Successful";
-                    result = "Deposited: " + amount;
+                    result = "Deposited: £" + amount;
                 } else if (!bank.deposit(amount)) {
                     // If balance doesn't allow, will return false
                     if (bank.getYearlyLimit() == bank.getYearlyCapD()) {
@@ -355,12 +405,13 @@ public class UIModel {
                 message = "Invalid Amount";
                 result = "An error has occured \nPlease reenter how much you want to deposit";
             }
-            numberPadInput = "";
+            inputA = "";
+            inputB = "";
         } else{
             reset("You are not logged in");
         }
         save(); //- Will save data to a serialized file for loading
-        saveRead(); // Will save data to a readable file for testing
+
         update();
     }
 
@@ -369,9 +420,12 @@ public class UIModel {
     // - Otherwise, reset the ATM and display an error message
     public void processFinish() {
         if (state.equals(STATE_MAINMENU_PAGE) ) {
-            reset("Thank you for using the Bank ATM");
+            message = "Sign-Out";
+            result = "               Thankyou for Banking with Emalka! \n \n" +
+                    "                       Press Enter to continue";;
             bank.logout();
-            view.signInPage(View.stage);
+            setState(STATE_GOODBYE_PAGE);
+            view.welcomePage(View.stage);
         } else {
             reset("You are not logged in");
         }
@@ -388,26 +442,19 @@ public class UIModel {
     // Handle clicking on text field during sign-in:
     public void processClick(String action){
         switch (action){
-            case "acc":
-                accPasswd = numberPadInput;
+            case "A":
+                inputA = "";
                 break;
-            case "pass":
-                accNumber = numberPadInput;
-                break;
-            case "curpass":
-                curPasswd = numberPadInput;
-                break;
-            case "newpass":
-                newPasswd = numberPadInput;
+            case "B":
+                inputB = "";
                 break;
         }
-        numberPadInput = "";
         update();
     }
 
     // Notify the View of changes by calling its update method
     private void update() {
-        view.update(message,numberPadInput, result);
+        view.update(message, inputA, inputB, result);
     }
 
     // Hide previous scene
@@ -415,6 +462,7 @@ public class UIModel {
         view.hideScene();
     }
 
+    /*
     // Writes the accounts array list to JSON file - Readable for testing
     private void saveRead() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -426,6 +474,8 @@ public class UIModel {
             e.printStackTrace();
         }
     }
+    */
+
     // Save the Bank object to a serialized file so it can be reloaded when program is next run
     public void save() {
         // Test serialization to local file
