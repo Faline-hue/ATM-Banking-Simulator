@@ -95,6 +95,8 @@ public class UIModel {
         if (focusField.equals("B")) {
             if (state.equals(STATE_SIGNIN_PAGE) || state.equals(STATE_CHANGE_PASS)) {
                 inputB += numberOnButton;
+            } else if(state.equals(STATE_WITHDRAW_CUSTOM)){
+                inputA += numberOnButton;
             }
         }
         else {
@@ -163,7 +165,7 @@ public class UIModel {
                     // Current password entered correctly
                      if (bank.changePassword(inputA, inputB)) {
                          result = "Password successfully updated\nYou may now return to menu";
-                         saveRead();
+
                          save();
                      }
                     else {
@@ -200,6 +202,7 @@ public class UIModel {
                             "                         Press Enter to continue";
 
                 }
+                break;
             default:
                 // Do nothing for other states (user is already logged in)
                 break;
@@ -351,7 +354,7 @@ public class UIModel {
             reset("You are not logged in");
         }
         save(); //- Will save data to a serialized file for loading
-        saveRead(); // Will save data to a readable file for testing
+
         update();
     }
 
@@ -408,7 +411,7 @@ public class UIModel {
             reset("You are not logged in");
         }
         save(); //- Will save data to a serialized file for loading
-        saveRead(); // Will save data to a readable file for testing
+
         update();
     }
 
@@ -459,6 +462,7 @@ public class UIModel {
         view.hideScene();
     }
 
+    /*
     // Writes the accounts array list to JSON file - Readable for testing
     private void saveRead() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -470,6 +474,8 @@ public class UIModel {
             e.printStackTrace();
         }
     }
+    */
+
     // Save the Bank object to a serialized file so it can be reloaded when program is next run
     public void save() {
         // Test serialization to local file

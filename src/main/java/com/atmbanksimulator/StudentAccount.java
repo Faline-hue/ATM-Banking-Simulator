@@ -17,7 +17,7 @@ public class StudentAccount extends BankAccount {
         this.dCapWD = 0;                    // Counts how much has been withdrawn daily
         this.dlyDepLimit = 3000;           // Limit on how much can be deposited daily
         this.dCapD = 0;                     // Counts how much has been deposited on current day
-        this.ylyDepLimit = 24000;           // Limit on how much can be deposited yearly
+        this.ylyDepLimit = 20000;           // Limit on how much can be deposited yearly
         this.yCapD = 0;                     // Counts how much has been deposited this year
         this.acsDate = LocalDate.now();     // Default assignment of current date when created
     }
